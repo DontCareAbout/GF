@@ -1,5 +1,6 @@
 package us.dontcareabout.gwt.client.util;
 
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
@@ -36,5 +37,9 @@ public class ImageUtil {
 			@Override public int getTop() { return 0; }
 			@Override public boolean isAnimated() { return false; }
 		};
+	}
+
+	public static ImageElement asElement(Image image) {
+		return ImageElement.as(image.getElement());
 	}
 }
