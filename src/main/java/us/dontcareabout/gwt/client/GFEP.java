@@ -55,8 +55,14 @@ public abstract class GFEP implements EntryPoint {
 		//query string 已經有指定就好啦
 		if (Location.getParameter("locale") != null) { return false; }
 
-		//預防萬一，轉成 GWT 要求的格式
-		String browser = language().replace("-", "_");
+		String browser = language();
+
+		if (browser == null) {	//browser 不支援就會得到 null
+			browser = defaultLocale;
+		} else {
+			//預防萬一，轉成 GWT 要求的格式
+			browser = browser.replace("-", "_");
+		}
 
 		if (browser.equals(defaultLocale)) { return false; }
 
