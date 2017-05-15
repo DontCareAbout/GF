@@ -1,4 +1,4 @@
-package com.dtc.autocare.gateway.server.api;
+package us.dontcareabout.gwt.server;
 
 import java.io.IOException;
 
