@@ -115,8 +115,6 @@ public abstract class GFEP implements EntryPoint {
 			if (!f.support) { notSupport.add(f); }
 		}
 
-		Console.inspect(notSupport);
-		Console.log(notSupport.isEmpty());
 		return notSupport.isEmpty();
 	}
 
