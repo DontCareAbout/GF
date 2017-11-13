@@ -35,9 +35,9 @@ public class LTextSprite extends TextSprite implements LSprite{
 		//允許 caller 在還沒作 Layer.add() 前就設定 setLX()
 		if (layer == null) { return; }
 
-		parameter.lock = true;
-		setX(layer.getX() + parameter.x);
 		parameter.lock = false;
+		setX(layer.getX() + parameter.x);
+		parameter.lock = true;
 	}
 
 	@Override
