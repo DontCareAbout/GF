@@ -42,6 +42,12 @@ public class Layer {
 
 	public void deploy(DrawComponent component) {
 		for (LSprite sprite : sprites) {
+			if (sprite instanceof LayerSprite) {
+				Layer layer = (Layer) sprite;
+				layer.deploy(component);
+				continue;
+			}
+
 			Sprite s = (Sprite)sprite;
 
 			//避免 caller 重複呼叫，所以用 getComponent() 是否為 null 來判斷是否加過了
