@@ -23,6 +23,8 @@ public class Layer {
 	private double y;
 	private int zIndex = 0;
 
+	private DrawComponent drawComponent;
+
 	public Layer() {
 		this(0, 0);
 	}
@@ -40,7 +42,40 @@ public class Layer {
 		sprite.setLZIndex(sprite.getLZIndex());
 	}
 
+	/**
+	 * 將指定的 sprite 從 {@link Layer} 上移除，同時也會自 {@link DrawComponent} 上移除。
+	 * <p>
+	 * 若指定的 sprite 是在 {@link LayerSprite} 之上（或是 {@link LayerSprite} 上的 {@link LayerSprite}），
+	 * remove() 依然可以將其移除。
+	 *
+	 * @see #undeploy()
+	 */
+	public void remove(LSprite target) {
+		for (LSprite sprite : sprites) {
+			if (sprite == target) {
+				if (sprite instanceof LayerSprite) {
+					((Layer)sprite).undeploy();
+					sprites.remove(sprite);
+				} else {
+					sprites.remove(sprite);
+					drawComponent.remove((Sprite)sprite);
+				}
+
+				return;
+			}
+		}
+
+		//第一層找不到，就看看有沒有 LayerSprite 然後往上找
+		for (LSprite sprite : sprites) {
+			if (sprite instanceof LayerSprite) {
+				((Layer)sprite).remove(target);
+			}
+		}
+	}
+
 	public void deploy(DrawComponent component) {
+		this.drawComponent = component;
+
 		for (LSprite sprite : sprites) {
 			if (sprite instanceof LayerSprite) {
 				Layer layer = (Layer) sprite;
@@ -54,6 +89,22 @@ public class Layer {
 			if (s.getComponent() != null) { continue; }
 
 			component.addSprite(s);
+		}
+	}
+
+	/**
+	 * 將 {@link Layer}（包含所擁有的 {@link LSprite}）從 {@link DrawComponent} 上移除。
+	 * <p>
+	 * <b>undeploy() 並不會影響 {@link Layer} 原本的 {@link LSprite} 結構</b>。
+	 * 如果要將 {@link LSprite} 從 {@link Layer} 中移除，請使用 {@link #remove(LSprite)}。
+	 */
+	public void undeploy() {
+		for (LSprite sprite : sprites) {
+			if (sprite instanceof LayerSprite) {
+				((Layer)sprite).undeploy();
+			} else {
+				drawComponent.remove((Sprite)sprite);
+			}
 		}
 	}
 
