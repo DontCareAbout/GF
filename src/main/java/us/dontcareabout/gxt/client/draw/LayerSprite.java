@@ -16,33 +16,24 @@ public class LayerSprite extends Layer implements LSprite {
 	@Override
 	public void setLX(double value) {
 		parameter.x = value;
-
-		if (layer == null) { return; }
-
 		parameter.lock = false;
-		setX(layer.getX() + parameter.x);
+		setX((layer == null ? 0 : layer.getX()) + parameter.x);
 		parameter.lock = true;
 	}
 
 	@Override
 	public void setLY(double value) {
 		parameter.y = value;
-
-		if (layer == null) { return; }
-
 		parameter.lock = false;
-		setY(layer.getY() + parameter.y);
+		setY((layer == null ? 0 : layer.getY()) + parameter.y);
 		parameter.lock = true;
 	}
 
 	@Override
 	public void setLZIndex(int value) {
 		parameter.zIndex = value;
-
-		if (layer == null) { return; }
-
 		parameter.lock = false;
-		setZIndex(layer.getZIndex() + parameter.zIndex);
+		setZIndex((layer == null ? 0 : layer.getZIndex()) + parameter.zIndex);
 		parameter.lock = true;
 	}
 
