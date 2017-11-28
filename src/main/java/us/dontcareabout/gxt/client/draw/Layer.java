@@ -8,11 +8,10 @@ import com.sencha.gxt.chart.client.draw.sprite.Sprite;
 /**
  * 可以一次調整一組 {@link LSprite}（實際上還是 {@link Sprite}）的 X、Y、ZIndex 的 class。
  * <p>
- * caller 透過 {@link #add(LSprite)} 將 sprite 納入此 Layer 的管轄範圍，
- * 然後用 {@link #deploy(DrawComponent)} 將此 Layer 所管轄的 sprite
- * 實際加到 {@link DrawComponent} 上。
+ * caller 透過 {@link #add(LSprite)} 將 sprite 變成 Layer 的 member sprite，
+ * 然後用 {@link #deploy(DrawComponent)} 將 member sprite 實際加到 {@link DrawComponent} 上。
  * 此後，只要呼叫對應 setter（例如 {@link #setX(double)}），
- * 就會將所管轄的 sprite 作對應的調整。
+ * 就會將所有 member sprite 作對應的調整。
  * <p>
  * <b>注意：{@link Layer} 不負責處理 redraw 時機</b>
  */
