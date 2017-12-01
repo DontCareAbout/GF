@@ -72,6 +72,29 @@ public class Layer {
 		}
 	}
 
+	/**
+	 * 判斷 member sprite 中是否包含指定的 sprite。
+	 * <p>
+	 * 若指定的 sprite 是 member sprite（{@link LayerSprite}）的 member sprite，
+	 * 也會回傳 true。
+	 */
+	public boolean hasSprite(Sprite target) {
+		//無法預期 DFS / BFS 哪個比較有效率，所以選擇程式碼比較簡單的 DFS
+		for (LSprite sprite : sprites) {
+			if (sprite instanceof LayerSprite) {
+				if (((LayerSprite)sprite).hasSprite(target)) {
+					return true;
+				}
+			} else {
+				if (sprite == target) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public void deploy(DrawComponent component) {
 		this.drawComponent = component;
 
