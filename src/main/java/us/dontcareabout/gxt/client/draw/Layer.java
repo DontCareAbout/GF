@@ -2,8 +2,22 @@ package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
 
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.HasSpriteOutHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.SpriteOutHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.HasSpriteOverHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.SpriteOverHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.HasSpriteSelectionHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelectionHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.HasSpriteUpHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.SpriteUpHandler;
 
 /**
  * 可以一次調整一組 {@link LSprite}（實際上還是 {@link Sprite}）的 X、Y、ZIndex 的 class。
@@ -15,7 +29,11 @@ import com.sencha.gxt.chart.client.draw.sprite.Sprite;
  * <p>
  * <b>注意：{@link Layer} 不負責處理 redraw 時機</b>
  */
-public class Layer {
+public class Layer
+	implements HasSpriteOutHandlers, HasSpriteOverHandlers, HasSpriteSelectionHandlers, HasSpriteUpHandlers {
+
+	private HandlerManager handlerManager;
+
 	private ArrayList<LSprite> sprites = new ArrayList<>();
 
 	private double x;
@@ -170,5 +188,36 @@ public class Layer {
 
 	public int getZIndex() {
 		return zIndex;
+	}
+
+	@Override
+	public HandlerRegistration addSpriteOutHandler(SpriteOutHandler handler) {
+		return ensureHandler().addHandler(SpriteOutEvent.getType(), handler);
+	}
+
+	@Override
+	public HandlerRegistration addSpriteOverHandler(SpriteOverHandler handler) {
+		return ensureHandler().addHandler(SpriteOverEvent.getType(), handler);
+	}
+
+	@Override
+	public HandlerRegistration addSpriteSelectionHandler(SpriteSelectionHandler handler) {
+		return ensureHandler().addHandler(SpriteSelectionEvent.getType(), handler);
+	}
+
+	@Override
+	public HandlerRegistration addSpriteUpHandler(SpriteUpHandler handler) {
+		return ensureHandler().addHandler(SpriteUpEvent.getType(), handler);
+	}
+
+	//比照 DrawComponent 用 protected
+	//其實 GWT / GXT 對 HandlerManager 的建立寫法有點混亂... ＝＝"
+	//（參見神奇的 ComponentHelper.ensureHandlers()）
+	protected HandlerManager ensureHandler() {
+		if (handlerManager == null) {
+			handlerManager = new HandlerManager(this);
+		}
+
+		return handlerManager;
 	}
 }
