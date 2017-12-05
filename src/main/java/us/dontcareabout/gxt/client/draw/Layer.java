@@ -2,6 +2,7 @@ package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
@@ -33,6 +34,7 @@ public class Layer
 	implements HasSpriteOutHandlers, HasSpriteOverHandlers, HasSpriteSelectionHandlers, HasSpriteUpHandlers {
 
 	private HandlerManager handlerManager;
+	private boolean stopPropagation = true;
 
 	private ArrayList<LSprite> sprites = new ArrayList<>();
 
@@ -113,6 +115,10 @@ public class Layer
 		return false;
 	}
 
+	/**
+	 * <b>注意：</b>如果會用到 {@link #addSpriteSelectionHandler(SpriteSelectionHandler)} 等功能，
+	 * 請改用 {@link LayerContainer#addLayer(Layer)} 來達到 deploy 的效果。
+	 */
 	public void deploy(DrawComponent component) {
 		this.drawComponent = component;
 
@@ -190,21 +196,49 @@ public class Layer
 		return zIndex;
 	}
 
+	public boolean isStopPropagation() {
+		return stopPropagation;
+	}
+
+	/**
+	 * 設定 event 是否不交由 member sprite 中的 {@link LayerSprite} 處理。
+	 * 如果設定為 true 表示不會，預設值為 true。
+	 * <p>
+	 * <b>注意</b>：如果 Layer 沒有掛載 handler，則會忽略此設定值。
+	 *
+	 * @see LayerContainer
+	 */
+	public void setStopPropagation(boolean stopPropagation) {
+		this.stopPropagation = stopPropagation;
+	}
+
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
+	 */
 	@Override
 	public HandlerRegistration addSpriteOutHandler(SpriteOutHandler handler) {
 		return ensureHandler().addHandler(SpriteOutEvent.getType(), handler);
 	}
 
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
+	 */
 	@Override
 	public HandlerRegistration addSpriteOverHandler(SpriteOverHandler handler) {
 		return ensureHandler().addHandler(SpriteOverEvent.getType(), handler);
 	}
 
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
+	 */
 	@Override
 	public HandlerRegistration addSpriteSelectionHandler(SpriteSelectionHandler handler) {
 		return ensureHandler().addHandler(SpriteSelectionEvent.getType(), handler);
 	}
 
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
+	 */
 	@Override
 	public HandlerRegistration addSpriteUpHandler(SpriteUpHandler handler) {
 		return ensureHandler().addHandler(SpriteUpEvent.getType(), handler);
@@ -219,5 +253,32 @@ public class Layer
 		}
 
 		return handlerManager;
+	}
+
+	//理論上只有 LayerContainer 會呼叫，所以用 default access level
+	void setContainer(LayerContainer container) {
+		this.drawComponent = container;
+	}
+
+	//理論上只有 LayerContainer 會呼叫，所以用 default access level
+	void handleEvent(GwtEvent<?> event, Sprite source) {
+		boolean flag = false;
+
+		if (handlerManager != null && handlerManager.getHandlerCount(event.getAssociatedType()) > 0) {
+			handlerManager.fireEvent(event);
+			flag = true;
+		}
+
+		if (flag && stopPropagation) { return; }
+
+		for (LSprite sprite : sprites) {
+			if (sprite instanceof LayerSprite) {
+				LayerSprite ls = (LayerSprite)sprite;
+
+				if (ls.hasSprite(source)) {
+					ls.handleEvent(event, source);
+				}
+			}
+		}
 	}
 }
