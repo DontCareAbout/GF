@@ -1,6 +1,8 @@
 package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
@@ -152,6 +154,13 @@ public class Layer
 				drawComponent.remove((Sprite)sprite);
 			}
 		}
+	}
+
+	/**
+	 * @return member sprite
+	 */
+	public List<LSprite> getSprites() {
+		return Collections.unmodifiableList(sprites);
 	}
 
 	public void setX(double value) {
