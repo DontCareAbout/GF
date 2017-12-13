@@ -89,6 +89,33 @@ public class LayerContainer extends DrawComponent {
 		layer.deploy(this);
 	}
 
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+
+		for (Layer layer : layers) {
+			processLayerOnLoad(layer);
+		}
+	}
+
+	/**
+	 * 處理在 {@link DrawComponent} attach 進 DOM 後才能作的事情。
+	 */
+	private void processLayerOnLoad(Layer layer) {
+		for (LSprite ls : layer.getSprites()) {
+			//在 SVG（Surface）下，只有在 attach 之後設定 cursor 才會起作用
+			//（因為這時候才找得到對應的 Element）
+			//所以在這裡統一檢查 / 補作 setCursor()
+			if (ls.getCursor() != null) {
+				ls.setCursor(ls.getCursor());
+			}
+
+			if (ls instanceof Layer) {
+				processLayerOnLoad((Layer) ls);
+			}
+		}
+	}
+
 	private void handleEvent(GwtEvent<?> event, Sprite sprite) {
 		for (Layer layer : layers) {
 			if (layer.hasSprite(sprite)) {
