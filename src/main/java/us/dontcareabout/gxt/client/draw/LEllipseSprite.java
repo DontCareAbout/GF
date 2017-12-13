@@ -5,6 +5,7 @@ import com.sencha.gxt.chart.client.draw.sprite.EllipseSprite;
 public class LEllipseSprite extends EllipseSprite implements LSprite {
 	private Parameter parameter = new Parameter();
 	private Layer layer;
+	private Cursor cursor;
 
 	@Override
 	public void setLayer(Layer layer) {
@@ -84,5 +85,19 @@ public class LEllipseSprite extends EllipseSprite implements LSprite {
 	@Override
 	public int getLZIndex() {
 		return parameter.zIndex;
+	}
+
+	@Override
+	public void setCursor(Cursor cursor) {
+		this.cursor = cursor;
+
+		if (getSurface() != null) {
+			setCursor(cursor.getName());
+		}
+	}
+
+	@Override
+	public Cursor getCursor() {
+		return cursor;
 	}
 }

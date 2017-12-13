@@ -38,4 +38,8 @@ interface LSprite {
 	 * 取得相對於 Layer 的 zIndex 值。
 	 */
 	int getLZIndex();
+
+	void setCursor(Cursor cursor);
+
+	Cursor getCursor();
 }
