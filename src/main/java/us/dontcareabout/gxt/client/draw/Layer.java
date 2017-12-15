@@ -269,8 +269,11 @@ public class Layer
 		this.drawComponent = container;
 	}
 
+	/**
+	 * @return 是否有觸發任何 handler（包含 member），若有觸發回傳 true。
+	 */
 	//理論上只有 LayerContainer 會呼叫，所以用 default access level
-	void handleEvent(GwtEvent<?> event, Sprite source) {
+	boolean handleEvent(GwtEvent<?> event, Sprite source) {
 		boolean flag = false;
 
 		if (handlerManager != null && handlerManager.getHandlerCount(event.getAssociatedType()) > 0) {
@@ -278,16 +281,19 @@ public class Layer
 			flag = true;
 		}
 
-		if (flag && stopPropagation) { return; }
+		if (flag && stopPropagation) { return flag; }
 
 		for (LSprite sprite : sprites) {
 			if (sprite instanceof LayerSprite) {
 				LayerSprite ls = (LayerSprite)sprite;
 
 				if (ls.hasSprite(source)) {
-					ls.handleEvent(event, source);
+					flag = flag | ls.handleEvent(event, source);
+					break;	//理論上一個 sprite 只會出現在一個 layer 上
 				}
 			}
 		}
+
+		return flag;
 	}
 }

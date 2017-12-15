@@ -119,7 +119,11 @@ public class LayerContainer extends DrawComponent {
 	private void handleEvent(GwtEvent<?> event, Sprite sprite) {
 		for (Layer layer : layers) {
 			if (layer.hasSprite(sprite)) {
-				layer.handleEvent(event, sprite);
+				if (layer.handleEvent(event, sprite)) {
+					redrawSurface();
+				};
+
+				break;	//理論上一個 sprite 只會出現在一個 layer 上
 			}
 		}
 	}
