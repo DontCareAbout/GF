@@ -1,6 +1,8 @@
 package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
@@ -87,6 +89,10 @@ public class LayerContainer extends DrawComponent {
 	public void addLayer(Layer layer) {
 		layers.add(layer);
 		layer.deploy(this);
+	}
+
+	public List<Layer> getLayers() {
+		return Collections.unmodifiableList(layers);
 	}
 
 	@Override
