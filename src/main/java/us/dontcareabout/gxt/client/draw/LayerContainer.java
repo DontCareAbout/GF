@@ -95,6 +95,17 @@ public class LayerContainer extends DrawComponent {
 		return Collections.unmodifiableList(layers);
 	}
 
+	public void clear() {
+		//不用 Layer.undeploy() 了，直接清空就算了 XD
+		layers.clear();
+		super.clearSurface();
+	}
+
+	@Override
+	public void clearSurface() {
+		throw new UnsupportedOperationException("Use clear() instead.");
+	}
+
 	@Override
 	protected void onLoad() {
 		super.onLoad();
