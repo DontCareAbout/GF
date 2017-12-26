@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteHandler;
@@ -71,7 +72,8 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
  * 			<li>呼叫一次 {@link #redrawSurfaceForced()}</li>
  * 		</ul>
- * </ul
+ * 	<li>禁止呼叫 {@link #setBackground(Color)}，並拔掉預設的白色 background</li>
+ * </ul>
  */
 public class LayerContainer extends DrawComponent {
 	private ArrayList<Layer> layers = new ArrayList<>();
@@ -82,6 +84,11 @@ public class LayerContainer extends DrawComponent {
 
 	public LayerContainer(int w, int h) {
 		super(w, h);
+
+		//常出現 background 漂到最上面蓋住其他 sprite 的情形（執行期隨機出現）
+		//所以直接把 background 拔掉
+		//caller 有需要就自己弄個 LayerSprite
+		super.setBackground(null);
 
 		addSpriteHandler(new SpriteHandler() {
 			@Override
@@ -124,6 +131,11 @@ public class LayerContainer extends DrawComponent {
 	@Override
 	public void clearSurface() {
 		throw new UnsupportedOperationException("Use clear() instead.");
+	}
+
+	@Override
+	public void setBackground(Color background) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
