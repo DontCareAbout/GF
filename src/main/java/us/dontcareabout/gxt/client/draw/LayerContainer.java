@@ -15,8 +15,16 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelect
 import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
 
 /**
- * {@link DrawComponent} 的延伸，解決 {@link DrawComponent} 處理 sprite handler 的缺陷。
- * <p>
+ * {@link DrawComponent} 的補強、並針對 {@link LSprite} 作延伸，
+ * 以解決 {@link DrawComponent} 在實務上遇到的問題：
+ * <ul>
+ * 	<li>sprite handler 機制</li>
+ * 	<li>改變預設行為</li>
+ * </ul>
+ *
+ *
+ * <h1>sprite handler 機制</h1>
+ *
  * 以「點擊 sprite」為例，
  * 原本 GXT 的設計是使用 {@link DrawComponent#addSpriteSelectionHandler(SpriteSelectionHandler)}，
  * 從 {@link SpriteSelectionEvent#getSprite()} 取得觸發的 sprite，然後才能作對應的處理。
@@ -52,6 +60,18 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * 		先觸發 layer A 的 handler，然後觸發 layer B 的 handler。
  * 	</li>
  * </ul>
+ *
+ *
+ * <h1>改變預設行為</h1>
+ *
+ * <ul>
+ * 	<li>
+ * 		onLoad()：
+ * 		<ul>
+ * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
+ * 			<li>呼叫一次 {@link #redrawSurfaceForced()}</li>
+ * 		</ul>
+ * </ul
  */
 public class LayerContainer extends DrawComponent {
 	private ArrayList<Layer> layers = new ArrayList<>();
