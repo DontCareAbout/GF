@@ -113,6 +113,13 @@ public class LayerContainer extends DrawComponent {
 		for (Layer layer : layers) {
 			processLayerOnLoad(layer);
 		}
+
+		//在 onResize() 中的邏輯若需要 bbox
+		//在 SVG（Surface）下，必須要會有 surfaceElement 才能得到正確 bbox
+		//要有 surfaceElement 必須要先呼叫 Surface.draw()
+		//唯一的觸發方式就是 redrawSurfaceForced()
+		//為避免各個 sprite 需要的時候都各自呼叫一次，所以這裡統一作一次
+		redrawSurfaceForced();
 	}
 
 	/**
