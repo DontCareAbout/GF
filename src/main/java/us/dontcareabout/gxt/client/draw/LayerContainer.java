@@ -68,10 +68,10 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * <ul>
  * 	<li>
  * 		onLoad()：
- * 		<ul>
- * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
+ * 		<ol>
  * 			<li>呼叫一次 {@link #redrawSurfaceForced()}</li>
- * 		</ul>
+ * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
+ * 		</ol>
  * 	<li>禁止呼叫 {@link #setBackground(Color)}，並拔掉預設的白色 background</li>
  * </ul>
  */
@@ -142,16 +142,20 @@ public class LayerContainer extends DrawComponent {
 	protected void onLoad() {
 		super.onLoad();
 
+		//很多實務上的邏輯需要 surfaceElement 先存在
+		//例如 setCursor()、或是要取得正確的 bbox（在 onResize() 中會用到）
+		//所以這裡統一作一次
+		redrawSurfaceForced();
+
 		for (Layer layer : layers) {
+			//LayerSprite 也可以設定 cursor
+			//但是塞不進 processLayerOnLoad()，所以就在這邊搞... (艸
+			if (layer instanceof LayerSprite) {
+				ensureCursor((LayerSprite) layer);
+			}
+
 			processLayerOnLoad(layer);
 		}
-
-		//在 onResize() 中的邏輯若需要 bbox
-		//在 SVG（Surface）下，必須要會有 surfaceElement 才能得到正確 bbox
-		//要有 surfaceElement 必須要先呼叫 Surface.draw()
-		//唯一的觸發方式就是 redrawSurfaceForced()
-		//為避免各個 sprite 需要的時候都各自呼叫一次，所以這裡統一作一次
-		redrawSurfaceForced();
 	}
 
 	/**
@@ -159,16 +163,17 @@ public class LayerContainer extends DrawComponent {
 	 */
 	private void processLayerOnLoad(Layer layer) {
 		for (LSprite ls : layer.getSprites()) {
-			//在 SVG（Surface）下，只有在 attach 之後設定 cursor 才會起作用
-			//（因為這時候才找得到對應的 Element）
-			//所以在這裡統一檢查 / 補作 setCursor()
-			if (ls.getCursor() != null) {
-				ls.setCursor(ls.getCursor());
-			}
+			ensureCursor(ls);
 
 			if (ls instanceof Layer) {
 				processLayerOnLoad((Layer) ls);
 			}
+		}
+	}
+
+	private void ensureCursor(LSprite ls) {
+		if (ls.getCursor() != null) {
+			ls.setCursor(ls.getCursor());
 		}
 	}
 
