@@ -162,7 +162,7 @@ public class LayerContainer extends DrawComponent {
 	 * 處理在 {@link DrawComponent} attach 進 DOM 後才能作的事情。
 	 */
 	private void processLayerOnLoad(Layer layer) {
-		for (LSprite ls : layer.getSprites()) {
+		for (LSprite ls : layer.getMembers()) {
 			ensureCursor(ls);
 
 			if (ls instanceof Layer) {
