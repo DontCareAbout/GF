@@ -163,6 +163,19 @@ public class Layer
 		return Collections.unmodifiableList(sprites);
 	}
 
+	/**
+	 * 設定所有 member（包含 member 的 member）的 cursor。
+	 */
+	public void setMemberCursor(Cursor cursor) {
+		for (LSprite member : sprites) {
+			if (member instanceof Layer) {
+				((Layer) member).setMemberCursor(cursor);
+			} else {
+				member.setCursor(cursor);
+			}
+		}
+	}
+
 	public void setX(double value) {
 		if (value == x) { return; }
 
