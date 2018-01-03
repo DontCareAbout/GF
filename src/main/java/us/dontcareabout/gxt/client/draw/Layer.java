@@ -1,6 +1,8 @@
 package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
@@ -36,7 +38,7 @@ public class Layer
 	private HandlerManager handlerManager;
 	private boolean stopPropagation = true;
 
-	private ArrayList<LSprite> sprites = new ArrayList<>();
+	private ArrayList<LSprite> members = new ArrayList<>();
 
 	private double x;
 	private double y;
@@ -54,7 +56,7 @@ public class Layer
 	}
 
 	public void add(LSprite sprite) {
-		sprites.add(sprite);
+		members.add(sprite);
 		sprite.setLayer(this);
 		sprite.setLX(sprite.getLX());
 		sprite.setLY(sprite.getLY());
@@ -64,19 +66,19 @@ public class Layer
 	/**
 	 * 將指定的 sprite 從 {@link Layer} 上移除，同時也會自 {@link DrawComponent} 上移除。
 	 * <p>
-	 * 若指定的 sprite 是在 {@link LayerSprite} 之上（或是 {@link LayerSprite} 上的 {@link LayerSprite}），
+	 * 若指定的 sprite 是 member 的 member，
 	 * remove() 依然可以將其移除。
 	 *
 	 * @see #undeploy()
 	 */
 	public void remove(LSprite target) {
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite == target) {
 				if (sprite instanceof LayerSprite) {
 					((Layer)sprite).undeploy();
-					sprites.remove(sprite);
+					members.remove(sprite);
 				} else {
-					sprites.remove(sprite);
+					members.remove(sprite);
 					drawComponent.remove((Sprite)sprite);
 				}
 
@@ -85,7 +87,7 @@ public class Layer
 		}
 
 		//第一層找不到，就看看有沒有 LayerSprite 然後往上找
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				((Layer)sprite).remove(target);
 			}
@@ -95,12 +97,12 @@ public class Layer
 	/**
 	 * 判斷 member sprite 中是否包含指定的 sprite。
 	 * <p>
-	 * 若指定的 sprite 是 member sprite（{@link LayerSprite}）的 member sprite，
+	 * 若指定的 sprite 是 member 的 member，
 	 * 也會回傳 true。
 	 */
 	public boolean hasSprite(Sprite target) {
 		//無法預期 DFS / BFS 哪個比較有效率，所以選擇程式碼比較簡單的 DFS
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				if (((LayerSprite)sprite).hasSprite(target)) {
 					return true;
@@ -122,7 +124,7 @@ public class Layer
 	public void deploy(DrawComponent component) {
 		this.drawComponent = component;
 
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				Layer layer = (Layer) sprite;
 				layer.deploy(component);
@@ -145,11 +147,28 @@ public class Layer
 	 * 如果要將 {@link LSprite} 從 {@link Layer} 中移除，請使用 {@link #remove(LSprite)}。
 	 */
 	public void undeploy() {
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				((Layer)sprite).undeploy();
 			} else {
 				drawComponent.remove((Sprite)sprite);
+			}
+		}
+	}
+
+	public List<LSprite> getMembers() {
+		return Collections.unmodifiableList(members);
+	}
+
+	/**
+	 * 設定所有 member（包含 member 的 member）的 cursor。
+	 */
+	public void setMemberCursor(Cursor cursor) {
+		for (LSprite member : members) {
+			if (member instanceof Layer) {
+				((Layer) member).setMemberCursor(cursor);
+			} else {
+				member.setCursor(cursor);
 			}
 		}
 	}
@@ -159,7 +178,7 @@ public class Layer
 
 		x = value;
 
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			sprite.setLX(sprite.getLX());
 		}
 	}
@@ -169,7 +188,7 @@ public class Layer
 
 		y = value;
 
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			sprite.setLY(sprite.getLY());
 		}
 	}
@@ -179,7 +198,7 @@ public class Layer
 
 		zIndex = value;
 
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			sprite.setLZIndex(sprite.getLZIndex());
 		}
 	}
@@ -260,8 +279,11 @@ public class Layer
 		this.drawComponent = container;
 	}
 
+	/**
+	 * @return 是否有觸發任何 handler（包含 member），若有觸發回傳 true。
+	 */
 	//理論上只有 LayerContainer 會呼叫，所以用 default access level
-	void handleEvent(GwtEvent<?> event, Sprite source) {
+	boolean handleEvent(GwtEvent<?> event, Sprite source) {
 		boolean flag = false;
 
 		if (handlerManager != null && handlerManager.getHandlerCount(event.getAssociatedType()) > 0) {
@@ -269,16 +291,19 @@ public class Layer
 			flag = true;
 		}
 
-		if (flag && stopPropagation) { return; }
+		if (flag && stopPropagation) { return flag; }
 
-		for (LSprite sprite : sprites) {
+		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				LayerSprite ls = (LayerSprite)sprite;
 
 				if (ls.hasSprite(source)) {
-					ls.handleEvent(event, source);
+					flag = flag | ls.handleEvent(event, source);
+					break;	//理論上一個 sprite 只會出現在一個 layer 上
 				}
 			}
 		}
+
+		return flag;
 	}
 }

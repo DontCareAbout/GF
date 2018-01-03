@@ -9,6 +9,7 @@ import com.sencha.gxt.chart.client.draw.sprite.TextSprite;
 public class LTextSprite extends TextSprite implements LSprite{
 	private Parameter parameter = new Parameter();
 	private Layer layer;
+	private Cursor cursor;
 
 	@Override
 	public void setLayer(Layer layer) {
@@ -93,5 +94,24 @@ public class LTextSprite extends TextSprite implements LSprite{
 	@Override
 	public int getLZIndex() {
 		return parameter.zIndex;
+	}
+
+	@Override
+	public void setCursor(Cursor cursor) {
+		this.cursor = cursor;
+
+		//Sprite.setCursor() 會檢查 surface 是否已經存在
+		//但是 LSprite 設計上希望 cursor 可以像其他屬性一樣可以不受時間點限制
+		//所以在這裡作一次判斷，以防止 Sprite.setCursor() 炸 assert
+		//在 SVG（Surface）下，完整的機制需搭配 LayoutContainer
+		//請參閱 LayoutContainer.processLayerOnLoad()
+		if (getSurface() != null) {
+			setCursor(cursor == null ? (String)null : cursor.getName());
+		}
+	}
+
+	@Override
+	public Cursor getCursor() {
+		return cursor;
 	}
 }

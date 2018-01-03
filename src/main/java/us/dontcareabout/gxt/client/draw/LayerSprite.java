@@ -21,6 +21,7 @@ public class LayerSprite extends Layer implements LSprite {
 	private Parameter parameter = new Parameter();
 	private Layer layer;
 	private LRectangleSprite bg = new LRectangleSprite();
+	private Cursor cursor;
 
 	public LayerSprite() {
 		this(0, 0);
@@ -151,6 +152,20 @@ public class LayerSprite extends Layer implements LSprite {
 		}
 
 		super.setZIndex(value);
+	}
+
+	@Override
+	public void setCursor(Cursor cursor) {
+		this.cursor = cursor;
+
+		if (bg.getSurface() != null) {
+			bg.setCursor(cursor == null ? (String)null : cursor.getName());
+		}
+	}
+
+	@Override
+	public Cursor getCursor() {
+		return cursor;
 	}
 
 	/**

@@ -1,8 +1,11 @@
 package us.dontcareabout.gxt.client.draw;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteHandler;
@@ -13,8 +16,16 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelect
 import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
 
 /**
- * {@link DrawComponent} 的延伸，解決 {@link DrawComponent} 處理 sprite handler 的缺陷。
- * <p>
+ * {@link DrawComponent} 的補強、並針對 {@link LSprite} 作延伸，
+ * 以解決 {@link DrawComponent} 在實務上遇到的問題：
+ * <ul>
+ * 	<li>sprite handler 機制</li>
+ * 	<li>改變預設行為</li>
+ * </ul>
+ *
+ *
+ * <h1>sprite handler 機制</h1>
+ *
  * 以「點擊 sprite」為例，
  * 原本 GXT 的設計是使用 {@link DrawComponent#addSpriteSelectionHandler(SpriteSelectionHandler)}，
  * 從 {@link SpriteSelectionEvent#getSprite()} 取得觸發的 sprite，然後才能作對應的處理。
@@ -50,6 +61,19 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * 		先觸發 layer A 的 handler，然後觸發 layer B 的 handler。
  * 	</li>
  * </ul>
+ *
+ *
+ * <h1>改變預設行為</h1>
+ *
+ * <ul>
+ * 	<li>
+ * 		onLoad()：
+ * 		<ol>
+ * 			<li>呼叫一次 {@link #redrawSurfaceForced()}</li>
+ * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
+ * 		</ol>
+ * 	<li>禁止呼叫 {@link #setBackground(Color)}，並拔掉預設的白色 background</li>
+ * </ul>
  */
 public class LayerContainer extends DrawComponent {
 	private ArrayList<Layer> layers = new ArrayList<>();
@@ -60,6 +84,11 @@ public class LayerContainer extends DrawComponent {
 
 	public LayerContainer(int w, int h) {
 		super(w, h);
+
+		//常出現 background 漂到最上面蓋住其他 sprite 的情形（執行期隨機出現）
+		//所以直接把 background 拔掉
+		//caller 有需要就自己弄個 LayerSprite
+		super.setBackground(null);
 
 		addSpriteHandler(new SpriteHandler() {
 			@Override
@@ -89,10 +118,69 @@ public class LayerContainer extends DrawComponent {
 		layer.deploy(this);
 	}
 
+	public List<Layer> getLayers() {
+		return Collections.unmodifiableList(layers);
+	}
+
+	public void clear() {
+		//不用 Layer.undeploy() 了，直接清空就算了 XD
+		layers.clear();
+		super.clearSurface();
+	}
+
+	@Override
+	public void clearSurface() {
+		throw new UnsupportedOperationException("Use clear() instead.");
+	}
+
+	@Override
+	public void setBackground(Color background) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+
+		//很多實務上的邏輯需要 surfaceElement 先存在
+		//例如 setCursor()、或是要取得正確的 bbox（在 onResize() 中會用到）
+		//所以這裡統一作一次 redrawSurfaceForced()→render()→SVG.draw()
+		//就能確保 surfaceElement 已經存在
+		redrawSurfaceForced();
+
+		for (Layer layer : layers) {
+			//LayerSprite 也可以設定 cursor
+			//但是塞不進 processLayerOnLoad()，所以就在這邊搞... (艸
+			if (layer instanceof LayerSprite) {
+				LayerSprite ls = (LayerSprite) layer;
+				ls.setCursor(ls.getCursor());
+			}
+
+			processLayerOnLoad(layer);
+		}
+	}
+
+	/**
+	 * 處理在 {@link DrawComponent} attach 進 DOM 後才能作的事情。
+	 */
+	private void processLayerOnLoad(Layer layer) {
+		for (LSprite ls : layer.getMembers()) {
+			ls.setCursor(ls.getCursor());
+
+			if (ls instanceof Layer) {
+				processLayerOnLoad((Layer) ls);
+			}
+		}
+	}
+
 	private void handleEvent(GwtEvent<?> event, Sprite sprite) {
 		for (Layer layer : layers) {
 			if (layer.hasSprite(sprite)) {
-				layer.handleEvent(event, sprite);
+				if (layer.handleEvent(event, sprite)) {
+					redrawSurface();
+				};
+
+				break;	//理論上一個 sprite 只會出現在一個 layer 上
 			}
 		}
 	}
