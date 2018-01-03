@@ -144,7 +144,8 @@ public class LayerContainer extends DrawComponent {
 
 		//很多實務上的邏輯需要 surfaceElement 先存在
 		//例如 setCursor()、或是要取得正確的 bbox（在 onResize() 中會用到）
-		//所以這裡統一作一次
+		//所以這裡統一作一次 redrawSurfaceForced()→render()→SVG.draw()
+		//就能確保 surfaceElement 已經存在
 		redrawSurfaceForced();
 
 		for (Layer layer : layers) {
