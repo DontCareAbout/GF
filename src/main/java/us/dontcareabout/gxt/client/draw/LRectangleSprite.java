@@ -92,7 +92,7 @@ public class LRectangleSprite extends RectangleSprite implements LSprite {
 		this.cursor = cursor;
 
 		if (getSurface() != null) {
-			setCursor(cursor.getName());
+			setCursor(cursor == null ? (String)null : cursor.getName());
 		}
 	}
 

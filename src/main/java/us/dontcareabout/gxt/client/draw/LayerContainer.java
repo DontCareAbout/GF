@@ -152,7 +152,8 @@ public class LayerContainer extends DrawComponent {
 			//LayerSprite 也可以設定 cursor
 			//但是塞不進 processLayerOnLoad()，所以就在這邊搞... (艸
 			if (layer instanceof LayerSprite) {
-				ensureCursor((LayerSprite) layer);
+				LayerSprite ls = (LayerSprite) layer;
+				ls.setCursor(ls.getCursor());
 			}
 
 			processLayerOnLoad(layer);
@@ -164,17 +165,11 @@ public class LayerContainer extends DrawComponent {
 	 */
 	private void processLayerOnLoad(Layer layer) {
 		for (LSprite ls : layer.getMembers()) {
-			ensureCursor(ls);
+			ls.setCursor(ls.getCursor());
 
 			if (ls instanceof Layer) {
 				processLayerOnLoad((Layer) ls);
 			}
-		}
-	}
-
-	private void ensureCursor(LSprite ls) {
-		if (ls.getCursor() != null) {
-			ls.setCursor(ls.getCursor());
 		}
 	}
 

@@ -159,7 +159,7 @@ public class LayerSprite extends Layer implements LSprite {
 		this.cursor = cursor;
 
 		if (bg.getSurface() != null) {
-			bg.setCursor(cursor.getName());
+			bg.setCursor(cursor == null ? (String)null : cursor.getName());
 		}
 	}
 

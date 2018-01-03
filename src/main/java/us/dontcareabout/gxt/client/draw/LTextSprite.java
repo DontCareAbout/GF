@@ -106,7 +106,7 @@ public class LTextSprite extends TextSprite implements LSprite{
 		//在 SVG（Surface）下，完整的機制需搭配 LayoutContainer
 		//請參閱 LayoutContainer.processLayerOnLoad()
 		if (getSurface() != null) {
-			setCursor(cursor.getName());
+			setCursor(cursor == null ? (String)null : cursor.getName());
 		}
 	}
 
