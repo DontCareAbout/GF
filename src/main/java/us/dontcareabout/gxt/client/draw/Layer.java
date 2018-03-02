@@ -95,6 +95,15 @@ public class Layer
 	}
 
 	/**
+	 * 移除所有 member（aka 對所有 member 作 {@link #remove(LSprite)}）
+	 */
+	public void clear() {
+		while(members.size() != 0) {
+			remove(members.get(0));
+		}
+	}
+
+	/**
 	 * 判斷 member sprite 中是否包含指定的 sprite。
 	 * <p>
 	 * 若指定的 sprite 是 member 的 member，

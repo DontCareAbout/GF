@@ -6,7 +6,7 @@ import com.sencha.gxt.chart.client.draw.sprite.Sprite;
  * 提供 {@link Layer} 一個獨立的 interface 以操作實際的 {@link Sprite}。
  */
 //實作邏輯請參考 LTextSprite
-interface LSprite {
+public interface LSprite {
 	void setLayer(Layer layer);
 
 	/**
