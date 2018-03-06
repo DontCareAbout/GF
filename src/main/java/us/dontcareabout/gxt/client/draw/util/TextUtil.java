@@ -2,7 +2,9 @@ package us.dontcareabout.gxt.client.draw.util;
 
 import java.util.HashMap;
 
+import com.google.common.base.Preconditions;
 import com.sencha.gxt.chart.client.draw.sprite.TextSprite;
+import com.sencha.gxt.core.client.util.PreciseRectangle;
 
 /**
  * {@link TextSprite} 的相關 util。
@@ -52,4 +54,47 @@ public class TextUtil {
 		return sprite.getFontSize() * getYOffsetRatio(sprite.getFont());
 	}
 	// ======== //
+
+	/**
+	 * 將字體大小調整到可以塞進指定的空間中，
+	 * 並限制字體大小最小值為 10。
+	 */
+	public static void autoResize(TextSprite text, double w, double h) {
+		autoResize(text, w, h, 10);
+	}
+
+	/**
+	 * 將字體大小調整到可以塞進指定的空間中。
+	 */
+	public static void autoResize(TextSprite text, double w, double h, int minSize) {
+		Preconditions.checkArgument(minSize > 0);
+
+		PreciseRectangle box = text.getBBox();
+		boolean flag = false;
+
+		//先判斷是不是爆框，如果爆框就只有縮小一途
+		while (box.getWidth() > w || box.getHeight() > h) {
+			flag = true;
+
+			//不能無止境的小下去...
+			if (text.getFontSize() < minSize) { break; }
+
+			text.setFontSize(text.getFontSize() - 1);
+			text.redraw();
+			box = text.getBBox();	//bbox 得每次 redraw() 之後重新取得才會是正確值
+		}
+
+		if (flag) { return; }
+
+		//原本沒有爆框，試著變大直到爆框
+		while (box.getWidth() < w && box.getHeight() < h) {
+			text.setFontSize(text.getFontSize() + 1);
+			text.redraw();
+			box = text.getBBox();
+		}
+
+		//往回退一號
+		text.setFontSize(text.getFontSize() - 1);
+		text.redraw();
+	}
 }
