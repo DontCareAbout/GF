@@ -2,6 +2,7 @@ package us.dontcareabout.gxt.client.draw.component;
 
 import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelectionHandler;
+import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.core.client.util.PreciseRectangle;
 
 import us.dontcareabout.gxt.client.draw.Cursor;
@@ -19,7 +20,7 @@ import us.dontcareabout.gxt.client.draw.util.TextUtil;
  */
 public class TextButton extends LayerSprite {
 	private LTextSprite textSprite = new LTextSprite();
-	private double margin;
+	private Margins margins = new Margins(5);
 
 	public TextButton() {
 		add(textSprite);
@@ -39,16 +40,27 @@ public class TextButton extends LayerSprite {
 		textSprite.setFill(color);
 	}
 
-	public void setMargin(double margin) {
-		this.margin = margin;
+	public void setMargin(int value) {
+		setMargins(new Margins(value));
+	}
+
+	public void setMargins(Margins margins) {
+		this.margins = margins;
 	}
 
 	@Override
 	protected void adjustMember() {
-		TextUtil.autoResize(textSprite, getWidth() - margin * 2, getHeight() - margin * 2);
+		TextUtil.autoResize(
+			textSprite,
+			getWidth() - margins.getLeft() - margins.getRight(),
+			getHeight() - margins.getTop() - margins.getBottom()
+		);
 
 		PreciseRectangle textBox = textSprite.getBBox();
-		textSprite.setLX((getWidth() - textBox.getWidth()) / 2.0);
-		textSprite.setLY((getHeight() - textBox.getHeight()) / 2.0 + TextUtil.getYOffset(textSprite));
+		textSprite.setLX((getWidth() + margins.getLeft() - margins.getRight() - textBox.getWidth()) / 2.0);
+		textSprite.setLY(
+			(getHeight() + margins.getTop() - margins.getBottom() - textBox.getHeight()) / 2.0
+			+ TextUtil.getYOffset(textSprite)
+		);
 	}
 }
