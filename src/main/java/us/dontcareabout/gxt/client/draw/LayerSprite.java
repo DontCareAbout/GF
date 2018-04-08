@@ -11,7 +11,7 @@ import com.sencha.gxt.chart.client.draw.DrawComponent;
  * LayerSprite 內建一個 {@link LRectangleSprite} 作為 background，
  * 因此有實際的大小與可視範圍（但是並沒有防止 member sprite 超出範圍 XD）。
  * caller 可在 {@link DrawComponent} onResize() 時
- * 呼叫 {@link #onResize(double, double)} 來調整 LayerSprite 的大小，
+ * 呼叫 {@link #resize(double, double)} 來調整 LayerSprite 的大小，
  * 並 override {@link #adjustMember()} 以實作各 member sprite 的對應調整。
  * <p>
  * 如果要調整 background 的樣式，請使用 setBg*() 系列 method，
@@ -29,24 +29,16 @@ public class LayerSprite extends Layer implements LSprite {
 		bg.setFill(Color.NONE);
 	}
 
-	public final void onResize(double width, double height) {
+	public final void resize(double width, double height) {
 		if (width < 0 || height < 0) { return; }
 
-		setWidth(width);
-		setHeight(height);
-		adjustMember();
-	}
-
-	public void setWidth(double width) {
 		bg.setWidth(width);
+		bg.setHeight(height);
+		adjustMember();
 	}
 
 	public double getWidth() {
 		return bg.getWidth();
-	}
-
-	public void setHeight(double height) {
-		bg.setHeight(height);
 	}
 
 	public double getHeight() {
@@ -164,7 +156,7 @@ public class LayerSprite extends Layer implements LSprite {
 	}
 
 	/**
-	 * 在 {@link #onResize(double, double)} 時提供 child class 調整 member sprite 的時機點。
+	 * 在 {@link #resize(double, double)} 時提供 child class 調整 member sprite 的時機點。
 	 */
 	protected void adjustMember() {}
 }
