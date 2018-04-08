@@ -24,11 +24,6 @@ public class LayerSprite extends Layer implements LSprite {
 	private Cursor cursor;
 
 	public LayerSprite() {
-		this(0, 0);
-	}
-
-	public LayerSprite(double x, double y) {
-		super(x, y);
 		add(bg);
 
 		bg.setFill(Color.NONE);
