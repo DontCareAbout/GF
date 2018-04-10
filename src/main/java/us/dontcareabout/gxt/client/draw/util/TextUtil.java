@@ -3,6 +3,7 @@ package us.dontcareabout.gxt.client.draw.util;
 import java.util.HashMap;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.sencha.gxt.chart.client.draw.sprite.TextSprite;
 import com.sencha.gxt.core.client.util.PreciseRectangle;
 
@@ -69,7 +70,14 @@ public class TextUtil {
 	public static void autoResize(TextSprite text, double w, double h, int minSize) {
 		Preconditions.checkArgument(minSize > 0);
 
+		//根本沒有字可以調整，掰掰
+		if (Strings.isNullOrEmpty(text.getText())) { return; }
+
 		PreciseRectangle box = text.getBBox();
+
+		//表示這個 TextSprite 還沒實際放上去
+		if (box.getWidth() == 0 || box.getHeight() == 0) { return; }
+
 		boolean flag = false;
 
 		//先判斷是不是爆框，如果爆框就只有縮小一途
