@@ -1,7 +1,11 @@
 package us.dontcareabout.gxt.client.draw;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
+
+import us.dontcareabout.gxt.client.draw.container.SimpleLayerContainer;
 
 /**
  * 特化版的 {@link Layer}。
@@ -17,11 +21,14 @@ import com.sencha.gxt.chart.client.draw.DrawComponent;
  * 如果要調整 background 的樣式，請使用 setBg*() 系列 method，
  * 例如 {@link #setBgRadius(double)}。
  */
-public class LayerSprite extends Layer implements LSprite {
+public class LayerSprite extends Layer implements LSprite, IsWidget {
 	private Parameter parameter = new Parameter();
 	private Layer layer;
 	private LRectangleSprite bg = new LRectangleSprite();
 	private Cursor cursor;
+
+	/** {@link #asWidget()} 必須回傳同一個 instance，所以只好開成 field */
+	private SimpleLayerContainer widget;
 
 	public LayerSprite() {
 		add(bg);
@@ -35,6 +42,15 @@ public class LayerSprite extends Layer implements LSprite {
 		bg.setWidth(width);
 		bg.setHeight(height);
 		adjustMember();
+	}
+
+	@Override
+	public Widget asWidget() {
+		if (widget == null) {
+			widget = new SimpleLayerContainer(this);
+		}
+
+		return widget;
 	}
 
 	public double getWidth() {
