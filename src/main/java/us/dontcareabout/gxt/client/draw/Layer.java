@@ -4,23 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.HasSpriteOutHandlers;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.SpriteOutHandler;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.HasSpriteOverHandlers;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.SpriteOverHandler;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.HasSpriteSelectionHandlers;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelectionHandler;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.HasSpriteUpHandlers;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.SpriteUpHandler;
 
 /**
  * 可以一次調整一組 {@link LSprite}（實際上還是 {@link Sprite}）的 X、Y、ZIndex 的 class。
@@ -32,12 +18,7 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.SpriteUpHandler;
  * <p>
  * <b>注意：{@link Layer} 不負責處理 redraw 時機</b>
  */
-public class Layer
-	implements HasSpriteOutHandlers, HasSpriteOverHandlers, HasSpriteSelectionHandlers, HasSpriteUpHandlers {
-
-	private HandlerManager handlerManager;
-	private boolean stopPropagation = true;
-
+public class Layer {
 	private ArrayList<LSprite> members = new ArrayList<>();
 
 	private double x;
@@ -222,97 +203,5 @@ public class Layer
 
 	public int getZIndex() {
 		return zIndex;
-	}
-
-	public boolean isStopPropagation() {
-		return stopPropagation;
-	}
-
-	/**
-	 * 設定 event 是否不交由 member sprite 中的 {@link LayerSprite} 處理。
-	 * 如果設定為 true 表示不會，預設值為 true。
-	 * <p>
-	 * <b>注意</b>：如果 Layer 沒有掛載 handler，則會忽略此設定值。
-	 *
-	 * @see LayerContainer
-	 */
-	public void setStopPropagation(boolean stopPropagation) {
-		this.stopPropagation = stopPropagation;
-	}
-
-	/**
-	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
-	 */
-	@Override
-	public HandlerRegistration addSpriteOutHandler(SpriteOutHandler handler) {
-		return ensureHandler().addHandler(SpriteOutEvent.getType(), handler);
-	}
-
-	/**
-	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
-	 */
-	@Override
-	public HandlerRegistration addSpriteOverHandler(SpriteOverHandler handler) {
-		return ensureHandler().addHandler(SpriteOverEvent.getType(), handler);
-	}
-
-	/**
-	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
-	 */
-	@Override
-	public HandlerRegistration addSpriteSelectionHandler(SpriteSelectionHandler handler) {
-		return ensureHandler().addHandler(SpriteSelectionEvent.getType(), handler);
-	}
-
-	/**
-	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(Layer)} 使用。
-	 */
-	@Override
-	public HandlerRegistration addSpriteUpHandler(SpriteUpHandler handler) {
-		return ensureHandler().addHandler(SpriteUpEvent.getType(), handler);
-	}
-
-	//比照 DrawComponent 用 protected
-	//其實 GWT / GXT 對 HandlerManager 的建立寫法有點混亂... ＝＝"
-	//（參見神奇的 ComponentHelper.ensureHandlers()）
-	protected HandlerManager ensureHandler() {
-		if (handlerManager == null) {
-			handlerManager = new HandlerManager(this);
-		}
-
-		return handlerManager;
-	}
-
-	//理論上只有 LayerContainer 會呼叫，所以用 default access level
-	void setContainer(LayerContainer container) {
-		this.drawComponent = container;
-	}
-
-	/**
-	 * @return 是否有觸發任何 handler（包含 member），若有觸發回傳 true。
-	 */
-	//理論上只有 LayerContainer 會呼叫，所以用 default access level
-	boolean handleEvent(GwtEvent<?> event, Sprite source) {
-		boolean flag = false;
-
-		if (handlerManager != null && handlerManager.getHandlerCount(event.getAssociatedType()) > 0) {
-			handlerManager.fireEvent(event);
-			flag = true;
-		}
-
-		if (flag && stopPropagation) { return flag; }
-
-		for (LSprite sprite : members) {
-			if (sprite instanceof LayerSprite) {
-				LayerSprite ls = (LayerSprite)sprite;
-
-				if (ls.hasSprite(source)) {
-					flag = flag | ls.handleEvent(event, source);
-					break;	//理論上一個 sprite 只會出現在一個 layer 上
-				}
-			}
-		}
-
-		return flag;
 	}
 }
