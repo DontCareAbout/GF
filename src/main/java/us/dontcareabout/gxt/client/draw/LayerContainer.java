@@ -31,8 +31,8 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * 從 {@link SpriteSelectionEvent#getSprite()} 取得觸發的 sprite，然後才能作對應的處理。
  * 如果會觸發 event 的 sprite 數量很多、那麼 handler 實作程式碼就會糾結一團十分混亂。
  * <p>
- * 導入 {@link Layer} 後，handler 實作改為 {@link Layer#addSpriteSelectionHandler(SpriteSelectionHandler)} 負責，
- * {@link LayerContainer} 只負責將 event 導向至擁有觸發 event 的 sprite 的 {@link Layer}。
+ * 導入 {@link LayerSprite} 後，handler 實作改為 {@link LayerSprite#addSpriteSelectionHandler(SpriteSelectionHandler)} 負責，
+ * {@link LayerContainer} 只負責將 event 導向至擁有觸發 event 的 sprite 的 {@link LayerSprite}。
  * <p>
  * 參考下圖
  * <pre>
@@ -76,7 +76,7 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * </ul>
  */
 public class LayerContainer extends DrawComponent {
-	private ArrayList<Layer> layers = new ArrayList<>();
+	private ArrayList<LayerSprite> layers = new ArrayList<>();
 
 	public LayerContainer() {
 		this(500, 500);
@@ -113,12 +113,12 @@ public class LayerContainer extends DrawComponent {
 		});
 	}
 
-	public void addLayer(Layer layer) {
+	public void addLayer(LayerSprite layer) {
 		layers.add(layer);
 		layer.deploy(this);
 	}
 
-	public List<Layer> getLayers() {
+	public List<LayerSprite> getLayers() {
 		return Collections.unmodifiableList(layers);
 	}
 
@@ -148,14 +148,7 @@ public class LayerContainer extends DrawComponent {
 		//就能確保 surfaceElement 已經存在
 		redrawSurfaceForced();
 
-		for (Layer layer : layers) {
-			//LayerSprite 也可以設定 cursor
-			//但是塞不進 processLayerOnLoad()，所以就在這邊搞... (艸
-			if (layer instanceof LayerSprite) {
-				LayerSprite ls = (LayerSprite) layer;
-				ls.setCursor(ls.getCursor());
-			}
-
+		for (LayerSprite layer : layers) {
 			processLayerOnLoad(layer);
 		}
 	}
@@ -163,18 +156,20 @@ public class LayerContainer extends DrawComponent {
 	/**
 	 * 處理在 {@link DrawComponent} attach 進 DOM 後才能作的事情。
 	 */
-	private void processLayerOnLoad(Layer layer) {
+	private void processLayerOnLoad(LayerSprite layer) {
+		layer.setCursor(layer.getCursor());
+
 		for (LSprite ls : layer.getMembers()) {
 			ls.setCursor(ls.getCursor());
 
-			if (ls instanceof Layer) {
-				processLayerOnLoad((Layer) ls);
+			if (ls instanceof LayerSprite) {
+				processLayerOnLoad((LayerSprite) ls);
 			}
 		}
 	}
 
 	private void handleEvent(GwtEvent<?> event, Sprite sprite) {
-		for (Layer layer : layers) {
+		for (LayerSprite layer : layers) {
 			if (layer.hasSprite(sprite)) {
 				if (layer.handleEvent(event, sprite)) {
 					redrawSurface();

@@ -1,9 +1,25 @@
 package us.dontcareabout.gxt.client.draw;
 
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
+import com.sencha.gxt.chart.client.draw.sprite.Sprite;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.HasSpriteOutHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.SpriteOutHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.HasSpriteOverHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteOverEvent.SpriteOverHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.HasSpriteSelectionHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelectionHandler;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.HasSpriteUpHandlers;
+import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent.SpriteUpHandler;
 
 import us.dontcareabout.gxt.client.draw.container.SimpleLayerContainer;
 
@@ -21,7 +37,12 @@ import us.dontcareabout.gxt.client.draw.container.SimpleLayerContainer;
  * 如果要調整 background 的樣式，請使用 setBg*() 系列 method，
  * 例如 {@link #setBgRadius(double)}。
  */
-public class LayerSprite extends Layer implements LSprite, IsWidget {
+public class LayerSprite extends Layer
+	implements LSprite, IsWidget, HasSpriteOutHandlers, HasSpriteOverHandlers, HasSpriteSelectionHandlers, HasSpriteUpHandlers {
+
+	private HandlerManager handlerManager;
+	private boolean stopPropagation = true;
+
 	private Parameter parameter = new Parameter();
 	private Layer layer;
 	private LRectangleSprite bg = new LRectangleSprite();
@@ -36,21 +57,28 @@ public class LayerSprite extends Layer implements LSprite, IsWidget {
 		bg.setFill(Color.NONE);
 	}
 
+	public boolean isStopPropagation() {
+		return stopPropagation;
+	}
+
+	/**
+	 * 設定 event 是否不交由 member sprite 中的 {@link LayerSprite} 處理。
+	 * 如果設定為 true 表示不會，預設值為 true。
+	 * <p>
+	 * <b>注意</b>：如果 Layer 沒有掛載 handler，則會忽略此設定值。
+	 *
+	 * @see LayerContainer
+	 */
+	public void setStopPropagation(boolean stopPropagation) {
+		this.stopPropagation = stopPropagation;
+	}
+
 	public final void resize(double width, double height) {
 		if (width < 0 || height < 0) { return; }
 
 		bg.setWidth(width);
 		bg.setHeight(height);
 		adjustMember();
-	}
-
-	@Override
-	public Widget asWidget() {
-		if (widget == null) {
-			widget = new SimpleLayerContainer(this);
-		}
-
-		return widget;
 	}
 
 	public double getWidth() {
@@ -171,8 +199,88 @@ public class LayerSprite extends Layer implements LSprite, IsWidget {
 		return cursor;
 	}
 
+	@Override
+	public Widget asWidget() {
+		if (widget == null) {
+			widget = new SimpleLayerContainer(this);
+		}
+
+		return widget;
+	}
+
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(LayerSprite)} 使用。
+	 */
+	@Override
+	public HandlerRegistration addSpriteOutHandler(SpriteOutHandler handler) {
+		return ensureHandler().addHandler(SpriteOutEvent.getType(), handler);
+	}
+
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(LayerSprite)} 使用。
+	 */
+	@Override
+	public HandlerRegistration addSpriteOverHandler(SpriteOverHandler handler) {
+		return ensureHandler().addHandler(SpriteOverEvent.getType(), handler);
+	}
+
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(LayerSprite)} 使用。
+	 */
+	@Override
+	public HandlerRegistration addSpriteSelectionHandler(SpriteSelectionHandler handler) {
+		return ensureHandler().addHandler(SpriteSelectionEvent.getType(), handler);
+	}
+
+	/**
+	 * <b>注意：</b>需搭配 {@link LayerContainer#addLayer(LayerSprite)} 使用。
+	 */
+	@Override
+	public HandlerRegistration addSpriteUpHandler(SpriteUpHandler handler) {
+		return ensureHandler().addHandler(SpriteUpEvent.getType(), handler);
+	}
+
 	/**
 	 * 在 {@link #resize(double, double)} 時提供 child class 調整 member sprite 的時機點。
 	 */
 	protected void adjustMember() {}
+
+	//比照 DrawComponent 用 protected
+	//其實 GWT / GXT 對 HandlerManager 的建立寫法有點混亂... ＝＝"
+	//（參見神奇的 ComponentHelper.ensureHandlers()）
+	protected HandlerManager ensureHandler() {
+		if (handlerManager == null) {
+			handlerManager = new HandlerManager(this);
+		}
+
+		return handlerManager;
+	}
+
+	/**
+	 * @return 是否有觸發任何 handler（包含 member），若有觸發回傳 true。
+	 */
+	//理論上只有 LayerContainer 會呼叫，所以用 default access level
+	boolean handleEvent(GwtEvent<?> event, Sprite source) {
+		boolean flag = false;
+
+		if (handlerManager != null && handlerManager.getHandlerCount(event.getAssociatedType()) > 0) {
+			handlerManager.fireEvent(event);
+			flag = true;
+		}
+
+		if (flag && stopPropagation) { return flag; }
+
+		for (LSprite sprite : getMembers()) {
+			if (sprite instanceof LayerSprite) {
+				LayerSprite ls = (LayerSprite)sprite;
+
+				if (ls.hasSprite(source)) {
+					flag = flag | ls.handleEvent(event, source);
+					break;	//理論上一個 sprite 只會出現在一個 layer 上
+				}
+			}
+		}
+
+		return flag;
+	}
 }

@@ -1,6 +1,5 @@
 package us.dontcareabout.gxt.client.draw.container;
 
-import us.dontcareabout.gxt.client.draw.Layer;
 import us.dontcareabout.gxt.client.draw.LayerContainer;
 import us.dontcareabout.gxt.client.draw.LayerSprite;
 
@@ -17,7 +16,7 @@ public class SimpleLayerContainer extends LayerContainer {
 	}
 
 	@Override
-	public void addLayer(Layer layer) {
+	public void addLayer(LayerSprite layer) {
 		throw new UnsupportedOperationException();
 	}
 
