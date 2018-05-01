@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
-import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelectionHandler;
 
 /**
  * 可以一次調整一組 {@link LSprite}（實際上還是 {@link Sprite}）的 X、Y、ZIndex 的 class。
@@ -15,6 +15,7 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteSelectionEvent.SpriteSelect
  * 然後用 {@link #deploy(DrawComponent)} 將 member sprite 實際加到 {@link DrawComponent} 上。
  * 此後，只要呼叫對應 setter（例如 {@link #setX(double)}），
  * 就會將所有 member sprite 作對應的調整。
+ * 如果已經 deploy 後又增加 {@link LSprite}，可使用 {@link #redeploy()} 來重新 deploy。
  * <p>
  * <b>注意：{@link Layer} 不負責處理 redraw 時機</b>
  */
@@ -107,17 +108,21 @@ public class Layer {
 		return false;
 	}
 
-	/**
-	 * <b>注意：</b>如果會用到 {@link #addSpriteSelectionHandler(SpriteSelectionHandler)} 等功能，
-	 * 請改用 {@link LayerContainer#addLayer(Layer)} 來達到 deploy 的效果。
-	 */
 	public void deploy(DrawComponent component) {
+		Preconditions.checkNotNull(component);
 		this.drawComponent = component;
+		redeploy();
+	}
+
+	public void redeploy() {
+		if (drawComponent == null) {
+			throw new UnsupportedOperationException("Haven't been deployed yet");
+		}
 
 		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				Layer layer = (Layer) sprite;
-				layer.deploy(component);
+				layer.deploy(drawComponent);
 				continue;
 			}
 
@@ -126,7 +131,7 @@ public class Layer {
 			//避免 caller 重複呼叫，所以用 getComponent() 是否為 null 來判斷是否加過了
 			if (s.getComponent() != null) { continue; }
 
-			component.addSprite(s);
+			drawComponent.addSprite(s);
 		}
 	}
 
