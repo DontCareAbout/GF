@@ -79,7 +79,7 @@ public class LayerSprite extends Layer
 		//如果 widget 的大小跟要調整的大小一樣，就不用調整了
 		//widget.setPixelSize() 最終會再次呼叫 LayerSprite.resize()
 		//這樣也可以避免潛在的效能問題
-		if (widget != null && widget.getOffsetWidth() != width && widget.getOffsetHeight() != height) {
+		if (widget != null && (widget.getOffsetWidth() != width || widget.getOffsetHeight() != height)) {
 			widget.setPixelSize((int)width, (int)height);
 			return;
 			//不用作後面調整 bg、adjustMember() 的事情
