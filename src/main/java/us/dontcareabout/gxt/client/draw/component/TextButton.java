@@ -48,6 +48,14 @@ public class TextButton extends LayerSprite {
 		this.margins = margins;
 	}
 
+	public String getText() {
+		return textSprite.getText();
+	}
+
+	public Margins getMargins() {
+		return margins;
+	}
+
 	@Override
 	protected void adjustMember() {
 		TextUtil.autoResize(
