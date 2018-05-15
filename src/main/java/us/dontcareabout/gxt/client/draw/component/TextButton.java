@@ -48,6 +48,14 @@ public class TextButton extends LayerSprite {
 		this.margins = margins;
 	}
 
+	public String getText() {
+		return textSprite.getText();
+	}
+
+	public Margins getMargins() {
+		return margins;
+	}
+
 	@Override
 	protected void adjustMember() {
 		TextUtil.autoResize(
@@ -62,5 +70,16 @@ public class TextButton extends LayerSprite {
 			(getHeight() + margins.getTop() - margins.getBottom() - textBox.getHeight()) / 2.0
 			+ TextUtil.getYOffset(textSprite)
 		);
+	}
+
+	//原本是直接讓 textSprite 開成 protected
+	//但是後來發現這樣沒啥意義而且還要 remote / add 一輪，徒增困擾
+	//所以改成 protected getter
+	//讓 child class 要作一些進階動作才有辦法動得到
+	//但是不直接開成 public 是為了確保封閉性
+	//以免 caller 作 setFontSize() 等動作造成混淆。
+	//child class 要亂搞就... 自己負責 XD
+	protected LTextSprite getTextSprite() {
+		return textSprite;
 	}
 }
