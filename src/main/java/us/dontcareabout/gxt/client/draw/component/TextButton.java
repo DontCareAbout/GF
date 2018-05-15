@@ -19,7 +19,12 @@ import us.dontcareabout.gxt.client.draw.util.TextUtil;
  * </ul>
  */
 public class TextButton extends LayerSprite {
-	private LTextSprite textSprite = new LTextSprite();
+	//直接開成 protected，讓 child class 要作一些進階動作才有辦法動得到
+	//但是不直接開成 public、也不給 public getter
+	//這樣設法保持封閉性，以免 caller 作 setFontSize() 等動作造成混淆。
+	//child class 要亂搞就... 自己負責 XD
+	protected LTextSprite textSprite = new LTextSprite();
+
 	private Margins margins = new Margins(5);
 
 	public TextButton() {
