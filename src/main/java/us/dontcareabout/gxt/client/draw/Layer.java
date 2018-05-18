@@ -16,8 +16,6 @@ import com.sencha.gxt.chart.client.draw.sprite.Sprite;
  * 此後，只要呼叫對應 setter（例如 {@link #setX(double)}），
  * 就會將所有 member sprite 作對應的調整。
  * 如果已經 deploy 後又增加 {@link LSprite}，可使用 {@link #redeploy()} 來重新 deploy。
- * <p>
- * <b>注意：{@link Layer} 不負責處理 redraw 時機</b>
  */
 public class Layer {
 	private ArrayList<LSprite> members = new ArrayList<>();
@@ -132,6 +130,25 @@ public class Layer {
 			if (s.getComponent() != null) { continue; }
 
 			drawComponent.addSprite(s);
+		}
+	}
+
+	/**
+	 * 使所屬的 {@link DrawComponent} 作 {@link DrawComponent#redrawSurface()}
+	 */
+	public void redraw() {
+		redraw(false);
+	}
+
+	/**
+	 * 使所屬的 {@link DrawComponent} 依傳入參數作
+	 * {@link DrawComponent#redrawSurface()} 或 {@link DrawComponent#redrawSurfaceForced()}。
+	 */
+	public void redraw(boolean isForced) {
+		if (isForced) {
+			drawComponent.redrawSurfaceForced();
+		} else {
+			drawComponent.redrawSurface();
 		}
 	}
 
