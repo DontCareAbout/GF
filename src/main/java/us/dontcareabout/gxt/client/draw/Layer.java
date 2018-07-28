@@ -52,6 +52,8 @@ public class Layer {
 	 * @see #undeploy()
 	 */
 	public void remove(LSprite target) {
+		if (drawComponent == null) { return; }
+
 		for (LSprite sprite : members) {
 			if (sprite == target) {
 				if (sprite instanceof LayerSprite) {
@@ -145,6 +147,8 @@ public class Layer {
 	 * {@link DrawComponent#redrawSurface()} 或 {@link DrawComponent#redrawSurfaceForced()}。
 	 */
 	public void redraw(boolean isForced) {
+		if (drawComponent == null) { return; }
+
 		if (isForced) {
 			drawComponent.redrawSurfaceForced();
 		} else {
@@ -159,6 +163,10 @@ public class Layer {
 	 * 如果要將 {@link LSprite} 從 {@link Layer} 中移除，請使用 {@link #remove(LSprite)}。
 	 */
 	public void undeploy() {
+		if (drawComponent == null) {
+			throw new UnsupportedOperationException("Haven't been deployed yet");
+		}
+
 		for (LSprite sprite : members) {
 			if (sprite instanceof LayerSprite) {
 				((Layer)sprite).undeploy();
