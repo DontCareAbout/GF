@@ -48,6 +48,10 @@ public class Layer {
 	 * <p>
 	 * 若指定的 sprite 是 member 的 member，
 	 * remove() 依然可以將其移除。
+	 * <p>
+	 * <b>注意：</b>目前 GXT {@link DrawComponent} 對同一個 {@link Sprite} 作 remove() 再 addSprite()，
+	 * 該 {@link Sprite} 並不會出現，這是 GXT 原生的行為 / bug，SSCCE 參見 GF-Test 的 Issue_31。
+	 * 這代表目前的版本中，若作過 {@link #remove(LSprite)}，則 {@link #add(LSprite)} 與 {@link #redeploy()} 並不會起作用。
 	 *
 	 * @see #undeploy()
 	 */
@@ -161,6 +165,10 @@ public class Layer {
 	 * <p>
 	 * <b>undeploy() 並不會影響 {@link Layer} 原本的 {@link LSprite} 結構</b>。
 	 * 如果要將 {@link LSprite} 從 {@link Layer} 中移除，請使用 {@link #remove(LSprite)}。
+	 * <p>
+	 * <b>注意：</b>目前 GXT {@link DrawComponent} 對同一個 {@link Sprite} 作 remove() 再 addSprite()，
+	 * 該 {@link Sprite} 並不會出現，這是 GXT 原生的行為 / bug，SSCCE 參見 GF-Test 的 Issue_31。
+	 * 這代表目前的版本中，若作過 {@link #undeploy()}，則 {@link #redeploy()} 並不會起作用。
 	 */
 	public void undeploy() {
 		if (drawComponent == null) {
@@ -171,7 +179,14 @@ public class Layer {
 			if (sprite instanceof LayerSprite) {
 				((Layer)sprite).undeploy();
 			} else {
-				drawComponent.remove((Sprite)sprite);
+				Sprite s = (Sprite)sprite;
+				drawComponent.remove(s);
+				//DrawComponent.remove() 沒有修改 sprite.component 的值
+				//這導致 deploy() 時會因為防止重複 deploy() 的機制
+				//而根本沒真正作 drawComponent.addSprite()
+				//雖然目前證實即使補了這段還是沒用（參見 GF-Test 的 Issue_33）
+				//不過還是先補上、使 GF 本身的邏輯是正確的...... Orz
+				s.setComponent(null);
 			}
 		}
 	}
