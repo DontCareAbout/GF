@@ -11,6 +11,16 @@ public class LTextSprite extends TextSprite implements LSprite{
 	private Layer layer;
 	private Cursor cursor;
 
+	public LTextSprite() {}
+
+	public LTextSprite(String text) {
+		super(text);
+	}
+
+	public LTextSprite(TextSprite sprite) {
+		super(sprite);
+	}
+
 	@Override
 	public void setLayer(Layer layer) {
 		this.layer = layer;
