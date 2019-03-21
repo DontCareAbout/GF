@@ -196,6 +196,22 @@ public class Layer {
 	}
 
 	/**
+	 * 設定所有 member（包含 member 的 member）的 hidden 狀態。
+	 * <p>
+	 * 註：由於 {@link Layer} 只是一個 sprite 的集合，本身並無實體，
+	 * 所以不提供 isHidden()。
+	 */
+	public void setHidden(boolean hidden) {
+		for (LSprite member : members) {
+			if (member instanceof Layer) {
+				((Layer) member).setHidden(hidden);;
+			} else {
+				member.setHidden(hidden);
+			}
+		}
+	}
+
+	/**
 	 * 設定所有 member（包含 member 的 member）的 cursor。
 	 */
 	public void setMemberCursor(Cursor cursor) {
