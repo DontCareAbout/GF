@@ -7,6 +7,18 @@ public class LEllipseSprite extends EllipseSprite implements LSprite {
 	private Layer layer;
 	private Cursor cursor;
 
+	public LEllipseSprite() {}
+
+	public LEllipseSprite(double radiusX, double radiusY) {
+		super(radiusX, radiusY);
+	}
+
+	public LEllipseSprite(EllipseSprite sprite) {
+		super(sprite);
+	}
+
+	//另外一個 super contructor 牽涉座標設定，與 LSprite 原則牴觸，所以不提供
+
 	@Override
 	public void setLayer(Layer layer) {
 		this.layer = layer;

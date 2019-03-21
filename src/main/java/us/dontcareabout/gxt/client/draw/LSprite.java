@@ -39,6 +39,10 @@ public interface LSprite {
 	 */
 	int getLZIndex();
 
+	void setHidden(boolean hidden);
+
+	boolean isHidden();
+
 	void setCursor(Cursor cursor);
 
 	Cursor getCursor();

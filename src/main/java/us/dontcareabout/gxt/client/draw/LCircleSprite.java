@@ -7,6 +7,18 @@ public class LCircleSprite extends CircleSprite implements LSprite {
 	private Layer layer;
 	private Cursor cursor;
 
+	public LCircleSprite() {}
+
+	public LCircleSprite(double radius) {
+		super(radius);
+	}
+
+	public LCircleSprite(CircleSprite sprite) {
+		super(sprite);
+	}
+
+	//另外一個 super contructor 牽涉座標設定，與 LSprite 原則牴觸，所以不提供
+
 	@Override
 	public void setLayer(Layer layer) {
 		this.layer = layer;

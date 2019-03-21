@@ -1,11 +1,22 @@
 package us.dontcareabout.gxt.client.draw;
 
+import com.google.gwt.resources.client.ImageResource;
 import com.sencha.gxt.chart.client.draw.sprite.ImageSprite;
 
 public class LImageSprite extends ImageSprite implements LSprite {
 	private Parameter parameter = new Parameter();
 	private Layer layer;
 	private Cursor cursor;
+
+	public LImageSprite() {}
+
+	public LImageSprite(ImageResource resource) {
+		super(resource);
+	}
+
+	public LImageSprite(ImageSprite sprite) {
+		super(sprite);
+	}
 
 	@Override
 	public void setLayer(Layer layer) {

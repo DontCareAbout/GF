@@ -197,6 +197,12 @@ public class LayerSprite extends Layer
 	}
 
 	@Override
+	public boolean isHidden() {
+		//不管 member，只以 background 的 hidden 為基準
+		return bg.isHidden();
+	}
+
+	@Override
 	public void setCursor(Cursor cursor) {
 		this.cursor = cursor;
 

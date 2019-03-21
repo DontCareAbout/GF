@@ -7,6 +7,18 @@ public class LRectangleSprite extends RectangleSprite implements LSprite {
 	private Layer layer;
 	private Cursor cursor;
 
+	public LRectangleSprite() {}
+
+	public LRectangleSprite(RectangleSprite sprite) {
+		super(sprite);
+	}
+
+	public LRectangleSprite(double width, double height) {
+		super(width, height);
+	}
+
+	//另外兩個 super contructor 牽涉座標設定，與 LSprite 原則牴觸，所以不提供
+
 	@Override
 	public void setLayer(Layer layer) {
 		this.layer = layer;
