@@ -73,6 +73,9 @@ public class TextUtil {
 		//根本沒有字可以調整，掰掰
 		if (Strings.isNullOrEmpty(text.getText())) { return; }
 
+		//bbox 得每次 redraw() 之後重新取得才會是正確值
+		//不明瞭為啥之前忘記要加...... Orz
+		text.redraw();
 		PreciseRectangle box = text.getBBox();
 
 		//表示這個 TextSprite 還沒實際放上去
