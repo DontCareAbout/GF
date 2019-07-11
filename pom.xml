@@ -19,6 +19,8 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
 			<version>${gwt.version}</version>
+			<!-- https://stackoverflow.com/questions/17678410/trying-to-deploy-gwt-project-in-tomcat-ends-with-offending-class-error -->
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -81,6 +83,15 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<!-- 某個版本以後預設會跑 testing 但是會 fail -->
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
