@@ -19,8 +19,6 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
 			<version>${gwt.version}</version>
-			<!-- https://stackoverflow.com/questions/17678410/trying-to-deploy-gwt-project-in-tomcat-ends-with-offending-class-error -->
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
