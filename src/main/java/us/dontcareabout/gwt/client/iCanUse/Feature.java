@@ -7,6 +7,8 @@ public enum Feature {
 	File_API(hasFileApi()),
 	Form_Data(hasFormData()),
 
+	Storage(com.google.gwt.storage.client.Storage.isSupported()),
+
 	Video(com.google.gwt.media.client.Video.isSupported()),
 
 	WebSocket(us.dontcareabout.gwt.client.websocket.WebSocket.isSupported()),
