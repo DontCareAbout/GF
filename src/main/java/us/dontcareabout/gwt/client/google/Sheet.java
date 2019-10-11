@@ -28,6 +28,9 @@ public class Sheet<T extends SheetEntry> {
 		if (entry == null) {
 			entry = new ArrayList<>();
 			JsArray<T> entryJS = gsjs.getEntry();
+
+			if (entryJS == null) { return entry; }
+
 			for (int i = 0; i < entryJS.length(); i++) {
 				T t = entryJS.get(i);
 				t.setIndex(i);
