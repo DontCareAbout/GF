@@ -20,6 +20,10 @@ public class Sheet<T extends SheetEntry> {
 		gsjs = JsonUtils.safeEval(json);
 	}
 
+	public String getTitle() {
+		return gsjs.getTitle();
+	}
+
 	public Date getUpdated() {
 		return gsjs.getUpdated();
 	}
@@ -47,6 +51,10 @@ public class Sheet<T extends SheetEntry> {
 		Date getUpdated() {
 			return DateTimeFormat.getFormat(PredefinedFormat.ISO_8601).parse(getUpdatedString());
 		}
+
+		private native String getTitle() /*-{
+			return this.feed.title.$t;
+		}-*/;
 
 		private native String getUpdatedString() /*-{
 			return this.feed.updated.$t;
