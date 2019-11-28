@@ -1,5 +1,9 @@
 package us.dontcareabout.gwt.client.websocket;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
+
 import us.dontcareabout.gwt.client.websocket.event.CloseEvent;
 import us.dontcareabout.gwt.client.websocket.event.CloseHandler;
 import us.dontcareabout.gwt.client.websocket.event.ErrorEvent;
@@ -8,12 +12,6 @@ import us.dontcareabout.gwt.client.websocket.event.MessageEvent;
 import us.dontcareabout.gwt.client.websocket.event.MessageHandler;
 import us.dontcareabout.gwt.client.websocket.event.OpenEvent;
 import us.dontcareabout.gwt.client.websocket.event.OpenHandler;
-import us.dontcareabout.gwt.client.websocket.event.SendEvent;
-import us.dontcareabout.gwt.client.websocket.event.SendHandler;
-
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
 
 public class WebSocket {
 	public static native boolean isSupported() /*-{
@@ -33,12 +31,7 @@ public class WebSocket {
 	}
 
 	public void send(String msg) {
-		eventBus.fireEvent(new SendEvent(msg));
 		jsWebSocket.send(msg);
-	}
-
-	public HandlerRegistration addSendHandler(SendHandler h) {
-		return eventBus.addHandler(SendEvent.TYPE, h);
 	}
 
 	public HandlerRegistration addOpenHandler(OpenHandler h) {
