@@ -23,11 +23,19 @@ public class WebSocket {
 	}-*/;
 
 	private HandlerManager eventBus = new HandlerManager(null);
-	private String uri;
+	private String url;
 	private JsWebSocket jsWebSocket;
 
-	public WebSocket(String uri) {
-		this.uri = uri;
+	public WebSocket(String url) {
+		setUrl(url);
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	/**
@@ -75,8 +83,9 @@ public class WebSocket {
 		eventBus.fireEvent(new CloseEvent());
 	}
 
-	public native void open() /*-{
-		var websocket = new $wnd.WebSocket(this.@us.dontcareabout.gwt.client.websocket.WebSocket::uri);
+	//傳 url 進來純粹只是懶得在 JSNI 裡頭打一堆字 XD
+	public native void open(String url) /*-{
+		var websocket = new $wnd.WebSocket(url);
 		this.@us.dontcareabout.gwt.client.websocket.WebSocket::jsWebSocket = websocket;
 
 		var self = this;
