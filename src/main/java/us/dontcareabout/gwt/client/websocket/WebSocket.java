@@ -27,6 +27,8 @@ public class WebSocket {
 	private String url;
 	private JsWebSocket jsWebSocket;
 
+	public WebSocket() {}
+
 	public WebSocket(String url) {
 		setUrl(url);
 	}
