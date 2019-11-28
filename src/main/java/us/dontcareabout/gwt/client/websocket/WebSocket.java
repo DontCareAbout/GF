@@ -1,5 +1,6 @@
 package us.dontcareabout.gwt.client.websocket;
 
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -51,6 +52,18 @@ public class WebSocket {
 		jsWebSocket.send(msg);
 	}
 
+	public void open() {
+		//若是 url 連不到，則不會炸任何 exception（但是 browser console 會有錯誤），
+		//而是觸發 onError()
+		//若是 url 格式有誤（細節不明），會炸 JavaScriptException
+		//因此在這裡作處理，讓兩個狀況都由 ErrorHandler 處理
+		try {
+			nativeOpen(url);
+		} catch (JavaScriptException jse) {
+			eventBus.fireEvent(new ErrorEvent(jse));
+		}
+	}
+
 	public HandlerRegistration addOpenHandler(OpenHandler h) {
 		return eventBus.addHandler(OpenEvent.TYPE, h);
 	}
@@ -84,7 +97,7 @@ public class WebSocket {
 	}
 
 	//傳 url 進來純粹只是懶得在 JSNI 裡頭打一堆字 XD
-	public native void open(String url) /*-{
+	private native void nativeOpen(String url) /*-{
 		var websocket = new $wnd.WebSocket(url);
 		this.@us.dontcareabout.gwt.client.websocket.WebSocket::jsWebSocket = websocket;
 
