@@ -30,6 +30,15 @@ public class WebSocket {
 		this.uri = uri;
 	}
 
+	/**
+	 * 在 instance 建立之後、{@link #open()} 之前，
+	 * 並未實際建立 WebSocket 連線，以 JS 的觀點理應是無法取得 readyState；
+	 * 但 GF 將其視為中斷連線的狀態，所以仍然會回傳 {@link ReadyState#CLOSED} 值。
+	 */
+	public ReadyState getReadyState() {
+		return ReadyState.valueOf(jsWebSocket.readyState());
+	}
+
 	public void send(String msg) {
 		jsWebSocket.send(msg);
 	}
@@ -90,5 +99,11 @@ class JsWebSocket extends JavaScriptObject {
 	protected JsWebSocket() {}
 	public native final void send(String msg) /*-{
 		this.send(msg);
+	}-*/;
+	native final int readyState() /*-{
+		//WebSocket 有可能在呼叫 open() 之前就作 getReadyState()
+		//此時 this（WebSocket.jsWebSocket）是 null
+		//設計上視為連線中斷，因此回傳 CLOSED 值。
+		return this == null ? 3 : this.readyState;
 	}-*/;
 }
