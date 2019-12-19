@@ -12,7 +12,7 @@ public class SheetEntry extends JavaScriptObject {
 	protected SheetEntry() {}
 
 	/**
-	 * @return 該筆 entry 在 Sheet 的 row index（起始值為 1）
+	 * @return 該筆 entry 在 Sheet 的 row index（起始值為 2）
 	 */
 	public final Integer getIndex() {
 		return intField("GF_INDEX");
@@ -46,6 +46,6 @@ public class SheetEntry extends JavaScriptObject {
 	//只給 Sheet 呼叫
 	final native void setIndex(int i) /*-{
 		this["gsx$GF_INDEX"] = [];
-		this["gsx$GF_INDEX"].$t = i + 1;
+		this["gsx$GF_INDEX"].$t = i;
 	}-*/;
 }

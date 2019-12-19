@@ -37,7 +37,9 @@ public class Sheet<T extends SheetEntry> {
 
 			for (int i = 0; i < entryJS.length(); i++) {
 				T t = entryJS.get(i);
-				t.setIndex(i);
+				//row 1 是 column name，row 2 才是真正的第一筆
+				//也因此改為在這裡就加上 offset，而不是在 SheetEntry.setIndex() 裡頭作
+				t.setIndex(i + 2);
 				entry.add(t);
 			}
 		}
