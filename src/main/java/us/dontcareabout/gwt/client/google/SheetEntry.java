@@ -40,6 +40,11 @@ public class SheetEntry extends JavaScriptObject {
 		return Strings.isNullOrEmpty(value) ? 0 : Double.valueOf(value);
 	}
 
+	protected final Boolean booleanField(String name) {
+		String value = stringField(name);
+		return Strings.isNullOrEmpty(value) ? false : Boolean.valueOf(value);
+	}
+
 	@SuppressWarnings("deprecation")
 	protected final Date dateField(String name) {
 		String value = stringField(name);
