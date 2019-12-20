@@ -19,7 +19,10 @@ public class SheetEntry extends JavaScriptObject {
 	}
 
 	protected final native String stringField(String name) /*-{
-		return this["gsx$" + name].$t;
+		//預防開發人員給錯 name、或是 sheet 上沒有對應 name
+		//由於 Google Sheet 對於沒輸入的 cell 就是回傳空字串
+		//所以這邊也比照辦理回傳空字串
+		return this["gsx$" + name] == null ? "" : this["gsx$" + name].$t;
 	}-*/;
 
 	protected final Integer intField(String name) {
