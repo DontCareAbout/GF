@@ -7,6 +7,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * <b>注意：</b>試算表的 column 名稱不能為「GF_INDEX」。
+ *
+ * @see Validatable
  */
 public class SheetEntry extends JavaScriptObject {
 	protected SheetEntry() {}
