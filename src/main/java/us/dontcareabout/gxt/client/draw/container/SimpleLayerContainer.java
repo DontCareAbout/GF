@@ -21,8 +21,7 @@ public class SimpleLayerContainer extends LayerContainer {
 	}
 
 	@Override
-	protected void onResize(int width, int height) {
+	protected void adjustMember(int width, int height) {
 		layer.resize(width, height);
-		super.onResize(width, height);
 	}
 }

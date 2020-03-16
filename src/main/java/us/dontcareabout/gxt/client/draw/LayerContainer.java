@@ -66,8 +66,9 @@ import com.sencha.gxt.chart.client.draw.sprite.SpriteUpEvent;
  * <h1>改變預設行為</h1>
  *
  * <ul>
+ * 	<li>{@link #onResize(int, int)}：改為 final。原來的功能改由 {@link #adjustMember(int, int)} 處理</li>
  * 	<li>
- * 		onLoad()：
+ * 		{@link #onLoad()}：
  * 		<ol>
  * 			<li>呼叫一次 {@link #redrawSurfaceForced()}</li>
  * 			<li>將所有 memeber sprite （如果有設定 cursor）作 {@link LSprite#setCursor(Cursor)}</li>
@@ -129,13 +130,29 @@ public class LayerContainer extends DrawComponent {
 	}
 
 	@Override
-	public void clearSurface() {
+	public final void clearSurface() {
 		throw new UnsupportedOperationException("Use clear() instead.");
 	}
 
 	@Override
-	public void setBackground(Color background) {
+	public final void setBackground(Color background) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param width 調整後的寬度
+	 * @param height 調整後的高度
+	 */
+	protected void adjustMember(int width, int height) {}
+
+	/**
+	 * 改由 {@link #adjustMember(int, int)} 處理，
+	 * 這是避免 child class 忘記 / 搞錯呼叫 super.onResize() 時機點。
+	 */
+	@Override
+	protected final void onResize(int width, int height) {
+		adjustMember(width, height);
+		super.onResize(width, height);
 	}
 
 	@Override
