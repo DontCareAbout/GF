@@ -29,11 +29,14 @@ public class TextButton extends LayerSprite {
 
 	public TextButton(String text) {
 		this();
-		setText(text);
+		//setText() 會作 adjustMember()，對 constructor 來說沒意義
+		//所以直接操作、不透過 setText() 了
+		textSprite.setText(text);
 	}
 
 	public void setText(String text) {
 		textSprite.setText(text);
+		adjustMember();
 	}
 
 	public void setTextColor(Color color) {
