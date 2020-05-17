@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.user.client.Window.Location;
+import com.sencha.gxt.core.client.GXT;
 
 import us.dontcareabout.gwt.client.iCanUse.Feature;
 
@@ -16,7 +18,7 @@ import us.dontcareabout.gwt.client.iCanUse.Feature;
  * 	<li>偵測語系，自動跳轉至該語系的 GWT 格式 URL</li>
  * 	<li>
  * 		定義 version。
- * 		在 browser 的 JS console 輸入 <code>version</code>，
+ * 		在 browser 的 JS console 輸入 <code>version</code> 或 <code>fullVersion</code>，
  * 		可得知程式定義的版本資訊
  * 	</li>
  * 	<li>偵測 browser 是否支援指定 {@link Feature}</li>
@@ -40,6 +42,7 @@ public abstract class GFEP implements EntryPoint {
 	public GFEP() {
 		this.defaultLocale = defaultLocale();
 		setVersion(version());
+		setFullVersion(fullVersion());
 	}
 
 	/** 定義版本資訊 */
@@ -118,10 +121,21 @@ public abstract class GFEP implements EntryPoint {
 		return notSupport.isEmpty();
 	}
 
+	private String fullVersion() {
+		return "GWT : " + GWT.getVersion() + "\n"
+			+ "GXT : " + GXT.getVersion().getRelease() + "\n"
+			+ "GF  : " + GF.getVersion() + "\n"
+			+ "app : " + version();
+	}
+
 	private static native String language() /*-{
 		return navigator.languages ?
 			navigator.languages[0] :
 			(navigator.language || navigator.userLanguage);
+	}-*/;
+
+	private static native void setFullVersion(String version) /*-{
+		$wnd.fullVersion = version;
 	}-*/;
 
 	private static native void setVersion(String version) /*-{
