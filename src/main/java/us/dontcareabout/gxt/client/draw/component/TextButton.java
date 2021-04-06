@@ -39,8 +39,24 @@ public class TextButton extends LayerSprite {
 		adjustMember();
 	}
 
+	public String getText() {
+		return textSprite.getText();
+	}
+
 	public void setTextColor(Color color) {
 		textSprite.setFill(color);
+	}
+
+	public Color getTextColor() {
+		return textSprite.getFill();
+	}
+
+	public void setTextOpacity(double opacity) {
+		textSprite.setOpacity(opacity);
+	}
+
+	public double getTextOpacity() {
+		return textSprite.getOpacity();
 	}
 
 	public void setMargin(int value) {
@@ -49,10 +65,6 @@ public class TextButton extends LayerSprite {
 
 	public void setMargins(Margins margins) {
 		this.margins = margins;
-	}
-
-	public String getText() {
-		return textSprite.getText();
 	}
 
 	public Margins getMargins() {

@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.chart.client.draw.Color;
 import com.sencha.gxt.chart.client.draw.DrawComponent;
+import com.sencha.gxt.chart.client.draw.RGB;
 import com.sencha.gxt.chart.client.draw.sprite.Sprite;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent;
 import com.sencha.gxt.chart.client.draw.sprite.SpriteOutEvent.HasSpriteOutHandlers;
@@ -36,6 +37,11 @@ import us.dontcareabout.gxt.client.draw.container.SimpleLayerContainer;
  * <p>
  * 如果要調整 background 的樣式，請使用 setBg*() 系列 method，
  * 例如 {@link #setBgRadius(double)}。
+ * <p>
+ * 為了預防沒有設定 background 底色而導致 {@link SpriteOverEvent} / {@link SpriteOutEvent} 的觸發狀況不如預期，
+ * 因此 background 預設 opacity 為 0（完全透明）、顏色為 {@link RGB#RED}。
+ * 這不會影響 {@link #setBgColor(Color)} / {@link #setBgOpacity(double)} 等 method 的行為，
+ * 也就是說，在還沒有設定過 background 底色的預設狀況下，{@link #getBgColor()} 的值會是 {@link Color#NONE}。
  */
 public class LayerSprite extends Layer
 	implements LSprite, IsWidget, HasSpriteOutHandlers, HasSpriteOverHandlers, HasSpriteSelectionHandlers, HasSpriteUpHandlers {
@@ -48,13 +54,23 @@ public class LayerSprite extends Layer
 	private LRectangleSprite bg = new LRectangleSprite();
 	private Cursor cursor;
 
+	/**
+	 * 利用這個 flag 來紀錄底色是否為 {@link Color#NONE}。
+	 * 若是 true，則 {@link #setBgOpacity(double)} / {@link #getBgOpacity()}
+	 * 實際對應的是 {@link #normalBgOpacity}，而非 bg 的值。
+	 */
+	private boolean isBgColorNone;
+	private double normalBgOpacity;
+
 	/** {@link #asWidget()} 必須回傳同一個 instance，所以只好開成 field */
 	private SimpleLayerContainer widget;
 
 	public LayerSprite() {
 		add(bg);
 
-		bg.setFill(Color.NONE);
+		//其實什麼顏色都可以，用（這麼醜的）紅色確保不會忘記他的存在 XD
+		bg.setFill(RGB.RED);
+		setBgColor(Color.NONE);
 	}
 
 	public boolean isStopPropagation() {
@@ -101,19 +117,35 @@ public class LayerSprite extends Layer
 	}
 
 	public void setBgColor(Color color) {
+		if (Color.NONE.equals(color)) {
+			//不是真的設定顏色，只是讓 bg 透明度為 0（等於看不見）
+			isBgColorNone = true;
+			normalBgOpacity = bg.getOpacity();
+			bg.setOpacity(0);
+			return;
+		}
+
+		isBgColorNone = false;
 		bg.setFill(color);
+		bg.setOpacity(normalBgOpacity);
 	}
 
 	public Color getBgColor() {
-		return bg.getFill();
+		return isBgColorNone ? Color.NONE : bg.getFill();
 	}
 
+	//這裡就不細分 fill / stroke 了，直接對應 opacity
 	public void setBgOpacity(double opacity) {
+		if (isBgColorNone) {
+			normalBgOpacity = opacity;
+			return;
+		}
+
 		bg.setOpacity(opacity);
 	}
 
 	public double getBgOpacity() {
-		return bg.getOpacity();
+		return isBgColorNone ? normalBgOpacity : bg.getOpacity();
 	}
 
 	public void setBgRadius(double radius) {
@@ -122,6 +154,24 @@ public class LayerSprite extends Layer
 
 	public double getBgRadius() {
 		return bg.getRadius();
+	}
+
+	//就 RectangleSprite 的原生行為來看，fill 跟 stroke 本來就是獨立的
+	//所以這裡也就不考慮讓它們有所關聯
+	public void setBgStrokeColor(Color color) {
+		bg.setStroke(color);
+	}
+
+	public Color getBgStrokeColor() {
+		return bg.getStroke();
+	}
+
+	public void setBgStrokeWidth(double width) {
+		bg.setStrokeWidth(width);
+	}
+
+	public double getBgStrokeWidth() {
+		return bg.getStrokeWidth();
 	}
 
 	@Override
