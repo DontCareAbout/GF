@@ -134,6 +134,7 @@ public class LayerSprite extends Layer
 		return isBgColorNone ? Color.NONE : bg.getFill();
 	}
 
+	//這裡就不細分 fill / stroke 了，直接對應 opacity
 	public void setBgOpacity(double opacity) {
 		if (isBgColorNone) {
 			normalBgOpacity = opacity;
@@ -153,6 +154,24 @@ public class LayerSprite extends Layer
 
 	public double getBgRadius() {
 		return bg.getRadius();
+	}
+
+	//就 RectangleSprite 的原生行為來看，fill 跟 stroke 本來就是獨立的
+	//所以這裡也就不考慮讓它們有所關聯
+	public void setBgStrokeColor(Color color) {
+		bg.setStroke(color);
+	}
+
+	public Color getBgStrokeColor() {
+		return bg.getStroke();
+	}
+
+	public void setBgStrokeWidth(double width) {
+		bg.setStrokeWidth(width);
+	}
+
+	public double getBgStrokeWidth() {
+		return bg.getStrokeWidth();
 	}
 
 	@Override
