@@ -6,6 +6,13 @@ import com.sencha.gxt.chart.client.draw.HSL;
 import com.sencha.gxt.chart.client.draw.RGB;
 
 public class ColorUtil {
+	/** @return 由亂數決定 RGB 的顏色 */
+	public static RGB random() {
+		return new RGB(
+			(int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)
+		);
+	}
+
 	/**
 	 * @param index 當值為 0～45 時，會回傳固定的顏色：
 	 * 	當值超過 45 時，則每次回傳由亂數組成的顏色。
@@ -34,9 +41,7 @@ public class ColorUtil {
 		}
 
 		//已經多到這種程度就無所謂了，都亂數就算了...... [眼神死]
-		return new RGB(
-			(int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)
-		);
+		return random();
 	}
 
 	/** @return 指定顏色應搭配黑色（明亮度高）或是白色（明亮度低） */
