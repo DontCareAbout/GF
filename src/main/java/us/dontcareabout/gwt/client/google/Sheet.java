@@ -11,6 +11,7 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 
+@Deprecated
 public class Sheet<T extends SheetEntry> {
 	//因為 JavaScriptObject subclass 不能有 field
 	//又希望 entry 可以只 build 一次
