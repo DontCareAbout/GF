@@ -6,6 +6,12 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 
+import us.dontcareabout.gwt.client.google.sheet.SheetDto;
+
+/**
+ * @deprecated 改用 {@link SheetDto}
+ */
+@Deprecated
 public class SheetHappen {
 	private static final String URL_HEAD = "https://spreadsheets.google.com/feeds/list/";
 	private static final String URL_TAIL = "/public/values?alt=json";
