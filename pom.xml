@@ -4,22 +4,27 @@
 	<groupId>us.dontcareabout</groupId>
 	<artifactId>gf</artifactId>
 	<version>0.1.1-SNAPSHOT</version>
-	
+
 	<repositories>
 		<repository>
-			<id>Sencha Maven Repository</id>
-			<name>Sencha Maven Repository-releases</name>
-			<url>https://maven.sencha.com/repo/gxt-gpl-release</url>
+			<id>Apache Maven2</id>
+			<url>https://repo.maven.apache.org/maven2/</url>
+		</repository>
+		<repository><!-- for GXT 4.0.0 GPL -->
+			<id>ImageJ</id>
+			<name>ImageJ Maven</name>
+			<url>http://maven.imagej.net/content/repositories/public/</url>
 		</repository>
 	</repositories>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<gwt.version>2.8.2</gwt.version>
 		<gxt.version>4.0.0</gxt.version>
-		<guava.version>27.0-jre</guava.version><!-- guava 28.0 會出現 compile 問題，因此只停在 27 -->
+		<guava.version>31.0.1-jre</guava.version>
+		<gwtjackson.version>0.15.4</gwtjackson.version>
 		<spring.version>4.1.9.RELEASE</spring.version>
 	</properties>
 
@@ -49,6 +54,12 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava-gwt</artifactId>
 			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.nmorel.gwtjackson</groupId>
+			<artifactId>gwt-jackson</artifactId>
+			<version>${gwtjackson.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
