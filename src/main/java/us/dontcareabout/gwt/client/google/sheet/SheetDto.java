@@ -93,17 +93,13 @@ public class SheetDto<T extends Row> {
 		}
 	}
 
-	public static interface Callback<T extends Row> {
-		void onSuccess(Sheet<T> gs);
-
-		/**
-		 * status code 原因參考：
-		 * <ul>
-		 * 	<li>400：range 無法正常解析</li>
-		 * 	<li>403：key 值不正確、sheet 的「共用」沒有設定為「知道連結的使用者」</li>
-		 * 	<li>404：sheetId 不正確</li>
-		 * </ul>
-		 */
-		void onError(Throwable exception);
-	}
+	/**
+	 * {@link #onError(Throwable)} 的 status code 原因參考：
+	 * <ul>
+	 * 	<li>400：range（tabName）無法正常解析</li>
+	 * 	<li>403：key 值不正確、sheet 的「共用」沒有設定為「知道連結的使用者」</li>
+	 * 	<li>404：sheetId 不正確</li>
+	 * </ul>
+	 */
+	public static interface Callback<T extends Row> extends us.dontcareabout.gwt.client.data.Callback<Sheet<T>>{}
 }
