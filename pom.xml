@@ -59,7 +59,6 @@
 			<groupId>com.github.nmorel.gwtjackson</groupId>
 			<artifactId>gwt-jackson</artifactId>
 			<version>${gwtjackson.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
