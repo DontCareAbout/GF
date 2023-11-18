@@ -13,7 +13,7 @@
 		<repository><!-- for GXT 4.0.0 GPL -->
 			<id>ImageJ</id>
 			<name>ImageJ Maven</name>
-			<url>http://maven.imagej.net/content/repositories/public/</url>
+			<url>https://maven.imagej.net/content/repositories/public/</url>
 		</repository>
 	</repositories>
 
