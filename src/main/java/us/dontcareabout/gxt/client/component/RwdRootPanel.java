@@ -33,12 +33,18 @@ public class RwdRootPanel extends Viewport {
 	private static RwdRootPanel instance;
 	private static int deviceType = 0;
 
+	//原本的 ensureInstance() 直接變成 static
+	static {
+		instance = new RwdRootPanel();
+		RootPanel.get().add(instance);
+		identifyDevice();
+	}
+
 	/**
 	 * 簡化 <code>RootPanel.get().add(new Viewport())</code>。
 	 * 可重複呼叫，第二次後會將原先 {@link Viewport} 上的 widget 移除後再加到 {@link Viewport} 中。
 	 */
 	public static void setComponent(Component c) {
-		ensureInstance();
 		Widget child = instance.getWidget();
 
 		if (child == c) { return; }
@@ -54,19 +60,23 @@ public class RwdRootPanel extends Viewport {
 	/**
 	 * 值域：{@value #DEVICE_MIN}（{@link #DEVICE_MIN}）～ {@value #DEVICE_4K}（{@link #DEVICE_4K}）。
 	 * 會用數字而不是 enum，是因為在後續使用上比較方便，
-	 * 例如「如果 device type 是 mobile」就可以直接寫成 <code>if (getDeviceType() <= DEVICE_MOBILE_L)</code>。
 	 */
 	public static int getDeviceType() {
 		return deviceType;
 	}
 
+	/**
+	 * @return {@link #getDeviceType()} 是否小於等於 {@link #DEVICE_MOBILE_L}
+	 */
+	public static boolean isMobileDevice() {
+		return deviceType <= DEVICE_MOBILE_L;
+	}
+
 	public static int getWidth() {
-		ensureInstance();
 		return instance.getOffsetWidth();
 	}
 
 	public static int getHeight() {
-		ensureInstance();
 		return instance.getOffsetHeight();
 	}
 
@@ -74,7 +84,6 @@ public class RwdRootPanel extends Viewport {
 	 * 等同 {@link Viewport#mask(String)}。
 	 */
 	public static void block(String string) {
-		ensureInstance();
 		instance.mask(string);
 	}
 
@@ -82,22 +91,11 @@ public class RwdRootPanel extends Viewport {
 	 * 等同 {@link Viewport#unmask()}。
 	 */
 	public static void unblock() {
-		ensureInstance();
 		instance.unmask();
 	}
 
-	private static void ensureInstance() {
-		if (instance == null) {
-			instance = new RwdRootPanel();
-			RootPanel.get().add(instance);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////
-
-	@Override
-	protected void doLayout() {
-		int width = getOffsetWidth();
+	private static void identifyDevice() {
+		int width = instance.getOffsetWidth();
 
 		deviceType = DEVICE_4K;
 
@@ -107,7 +105,13 @@ public class RwdRootPanel extends Viewport {
 				break;
 			}
 		}
+	}
 
+	//////////////////////////////////////////////////////////////////
+
+	@Override
+	protected void doLayout() {
+		identifyDevice();
 		super.doLayout();
 	}
 }
